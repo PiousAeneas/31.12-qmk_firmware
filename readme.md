@@ -1,3 +1,6 @@
+**PiousAeneas Custom Keymaps**:
+- [Ploopy Adept](https://github.com/PiousAeneas/qmk_firmware/tree/master/keyboards/ploopyco/madromys/keymaps/PiousAeneas)
+
 # Quantum Mechanical Keyboard Firmware
 
 [![Current Version](https://img.shields.io/github/tag/qmk/qmk_firmware.svg)](https://github.com/qmk/qmk_firmware/tags)

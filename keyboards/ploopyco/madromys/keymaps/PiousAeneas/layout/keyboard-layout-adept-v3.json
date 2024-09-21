@@ -1,0 +1,174 @@
+[
+  [
+    {
+      "a": 5,
+      "w": 18.5,
+      "h": 0.75,
+      "d": true
+    },
+    "<b>Ploopy Adept Keymap</b><br>Ambidextrous and cross-platform with combo drag scroll, browser navigation, and clipboard functions"
+  ],
+  [
+    {
+      "y": -0.25,
+      "t": "#000000\n#0e9c14",
+      "w": 1.5,
+      "h": 2
+    },
+    "\nRedo\n\n\n\n\nBTN2",
+    {
+      "w": 1.5,
+      "h": 1.5
+    },
+    "<i>Tap / Hold</i>\nUndo\n\n\nDrag Scroll\n\n<b>SCROLL</b>",
+    {
+      "t": "#000000\n\n\n\n#0e9c14",
+      "w": 1.5,
+      "h": 1.5
+    },
+    "<i>Tap / Hold</i>\n\n\n\n<b>LCLIP</b>\n\nBack",
+    {
+      "t": "#000000\n#0e9c14",
+      "w": 1.5,
+      "h": 2
+    },
+    "\n1:Copy<br>2:Cut\n\n\n\n\nFwd",
+    {
+      "x": 0.25,
+      "t": "#000000",
+      "a": 7,
+      "w": 1.5,
+      "h": 2
+    },
+    "PgUp",
+    {
+      "w": 1.5,
+      "h": 1.5
+    },
+    "<b>LEFT</b>",
+    {
+      "w": 1.5,
+      "h": 1.5
+    },
+    "<b>RIGHT</b>",
+    {
+      "w": 1.5,
+      "h": 2
+    },
+    "PgUp",
+    {
+      "x": 0.25,
+      "t": "#000000\n#0428c7",
+      "a": 5,
+      "w": 1.5,
+      "h": 2
+    },
+    "\n1:Copy<br>2:Cut\n\n\n\n\nBack",
+    {
+      "t": "#000000\n\n\n\n#0428c7",
+      "w": 1.5,
+      "h": 1.5
+    },
+    "<i>Tap / Hold</i>\n\n\n\n<b>RCLIP</b>\n\nFwd",
+    {
+      "t": "#000000\n#0428c7",
+      "w": 1.5,
+      "h": 1.5
+    },
+    "<i>Tap / Hold</i>\nUndo\n\n\nDrag Scroll\n\n<b>SCROLL</b>",
+    {
+      "w": 1.5,
+      "h": 2
+    },
+    "\nRedo\n\n\n\n\nBTN2"
+  ],
+  [
+    {
+      "y": 0.5,
+      "x": 1.5,
+      "t": "#000000",
+      "w": 3,
+      "h": 1.5,
+      "d": true
+    },
+    "\nAlternate Layer\n\n\n\n\n<b>LEFT</b>",
+    {
+      "x": 3.25,
+      "w": 3,
+      "h": 1.5,
+      "d": true
+    },
+    "\n<i>is_drag_scroll = 1</i>\n\n\n\n\n<b>SCROLL</b>",
+    {
+      "x": 3.25,
+      "w": 3,
+      "h": 1.5,
+      "d": true
+    },
+    "\nDefault Layer\n\n\n\n\n<b>RIGHT</b>"
+  ],
+  [
+    {
+      "y": -0.5,
+      "t": "#000000\n#0e9c14",
+      "w": 1.5,
+      "h": 2,
+      "w2": 2.25,
+      "h2": 1,
+      "y2": 1
+    },
+    "\n1:Mac<br>2:Win\n\n\n\n\n<b>RIGHT</b>",
+    {
+      "x": 3,
+      "w": 1.5,
+      "h": 2,
+      "w2": 2.25,
+      "h2": 1,
+      "x2": -0.75,
+      "y2": 1
+    },
+    "\n1:Paste<br>2:PstSp\n\n\n\n\nBTN1",
+    {
+      "x": 0.25,
+      "t": "#000000",
+      "a": 7,
+      "w": 1.5,
+      "h": 2,
+      "w2": 2.25,
+      "h2": 1,
+      "y2": 1
+    },
+    "PgDn",
+    {
+      "x": 3,
+      "w": 1.5,
+      "h": 2,
+      "w2": 2.25,
+      "h2": 1,
+      "x2": -0.75,
+      "y2": 1
+    },
+    "PgDn",
+    {
+      "x": 0.25,
+      "t": "#000000\n#0428c7",
+      "a": 5,
+      "w": 1.5,
+      "h": 2,
+      "w2": 2.25,
+      "h2": 1,
+      "y2": 1
+    },
+    "\n1:Paste<br>2:PstSp\n\n\n\n\nBTN1",
+    {
+      "x": 3,
+      "w": 1.5,
+      "h": 2,
+      "w2": 2.25,
+      "h2": 1,
+      "x2": -0.75,
+      "y2": 1
+    },
+    "\n1:Mac<br>2:Win\n\n\n\n\n<b>LEFT</b>"
+  ]
+]
