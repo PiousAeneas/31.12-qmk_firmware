@@ -48,13 +48,14 @@ bool isMac = false;
 // TAP DANCE
 // Tap dance declarations
 enum {
-    U_TD_MAC, // Toggle Mac Mode
+    U_TD_MAC, // Toggle Mac Mode (default = Win)
+    U_TD_CPYCUT, // 1:Copy, 2:Cut
     U_TD_PST, // 1:Paste, 2:Paste Special i.e. without formatting
 };
 
 // Tap dance helper functions
-void u_td_mac_fn(tap_dance_state_t *state, void *user_data) { // Toggle Mac Mode
-    switch (state->count) {
+void u_td_mac_fn(tap_dance_state_t *state, void *user_data) { // 1:Mac, 2:Win
+    switch (state->count) { // Use state->count to determine tap count
         case 1:
             isMac = true; // Turn on Mac Mode
             keymap_config.swap_lctl_lgui = true; // Swap Left Control and GUI
@@ -65,64 +66,61 @@ void u_td_mac_fn(tap_dance_state_t *state, void *user_data) { // Toggle Mac Mode
             keymap_config.swap_lctl_lgui = false;
             keymap_config.swap_rctl_rgui = false;
             break;
+        default:
+            break; // Do nothing for unexpected tap counts
     }
 }
 
-void u_pst_fn(void) { // Paste helper function
-    if (isMac) { // Send Cmd+V for Mac
-        register_code(KC_LCMD);
-        tap_code(KC_V);
+void u_td_cpycut_fn(tap_dance_state_t *state, void *user_data) { // 1:Copy, 2:Cut
+    uint8_t modifier = isMac ? KC_LCMD : KC_LCTL; // Choose modifier based on Mac mode
+    uint8_t keycode = (state->count == 1) ? KC_C : KC_X; // Choose keycode based on tap count
+
+    register_code(modifier); // Press and hold modifier
+    tap_code(keycode); // Press and release the relevant key (C for copy, X for cut)
+    unregister_code(modifier); // Release modifier
+}
+
+void u_td_pst_sp_fn(tap_dance_state_t *state, void *user_data) { // 1:Paste, 2:Paste Special
+    if (isMac) { 
+        register_code(KC_LCMD); 
+        if (state->count == 2) { // Paste Special requires additional modifiers
+            register_code(KC_LSFT);
+            register_code(KC_LALT);
+        }
+        tap_code(KC_V); // Press and release V key
         unregister_code(KC_LCMD);
-    } else { // Send Ctrl+V for Windows
+        if (state->count == 2) {
+            unregister_code(KC_LALT);
+            unregister_code(KC_LSFT);
+        }
+    } else { // Windows shortcuts
         register_code(KC_LCTL);
+        if (state->count == 2) { // Paste Special in Windows
+            register_code(KC_LSFT); 
+        }
         tap_code(KC_V);
+        if (state->count == 2) {
+            unregister_code(KC_LSFT);
+        }
         unregister_code(KC_LCTL);
     }
 }
-
-void u_pst_sp_fn(void) { // Paste Special helper function
-    if (isMac) { // Send Shift+Opt+Cmd+V for Mac
-        register_code(KC_LSFT);
-        register_code(KC_LALT);
-        register_code(KC_LCMD);
-        tap_code(KC_V);
-        unregister_code(KC_LCMD);
-        unregister_code(KC_LALT);
-        unregister_code(KC_LSFT);
-    } else { // Send Ctrl+Shift+V for Windows
-        register_code(KC_LCTL);
-        register_code(KC_LSFT);
-        tap_code(KC_V);
-        unregister_code(KC_LSFT);
-        unregister_code(KC_LCTL);
-    }
-}
-
-void u_td_pst_sp_fn(tap_dance_state_t *state, void *user_data) { // Paste Special tap dance helper function
-    switch (state->count) {
-        case 1:
-            u_pst_fn();
-            break;
-        case 2:
-            u_pst_sp_fn();
-            break;
-    }
-}
-
 
 // Tap dance actions array
 tap_dance_action_t tap_dance_actions[] = {
-    [U_TD_MAC] = ACTION_TAP_DANCE_FN(u_td_mac_fn), // Mac Mode
-    [U_TD_PST] = ACTION_TAP_DANCE_FN(u_td_pst_sp_fn), // Paste Special
+    [U_TD_MAC]      = ACTION_TAP_DANCE_FN(u_td_mac_fn), // Mac Mode
+    [U_TD_CPYCUT]   = ACTION_TAP_DANCE_FN(u_td_cpycut_fn), // Copy or Cut
+    [U_TD_PST]      = ACTION_TAP_DANCE_FN(u_td_pst_sp_fn), // Paste Special
 };
 
 // CUSTOM KEYCODES
-
-enum custom_keycodes { // Define custom keycodes
+// Define custom keycodes
+enum custom_keycodes {
     U_BRWSR_BCK = SAFE_RANGE, U_BRWSR_FWD, // Browser navigation
 };
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) { // Custom keycode handling
+// Custom keycode handling
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     // Browser navigation with U_BRWSR_BCK and U_BRWSR_FWD
     case U_BRWSR_BCK:
@@ -163,31 +161,31 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     // Default right-handed base layer
     [_RIGHT] = LAYOUT(
-        U_BRWSR_BCK,    U_BRWSR_FWD,    DRAG_SCROLL,    KC_BTN2,
-        KC_BTN1,                                        DF(_LEFT)
+        U_BRWSR_BCK,        U_BRWSR_FWD,    DRAG_SCROLL,    KC_BTN2,
+        KC_BTN1,                                            DF(_LEFT)
     ),
 
     // Alternate left-handed base layer
     [_LEFT] = LAYOUT(
-        KC_BTN2,        DRAG_SCROLL,    U_BRWSR_BCK,    U_BRWSR_FWD,    
-        DF(_RIGHT),                                     KC_BTN1
+        KC_BTN2,            DRAG_SCROLL,    U_BRWSR_BCK,    U_BRWSR_FWD,    
+        DF(_RIGHT),                                         KC_BTN1
     ),
 
-    // Right hand clipboard layer
+    // Right hand clipboard layer - Copy, Cut, Undo, Redo, Paste, and Mac toggle
     [_RCLIP] = LAYOUT(
-        U_CPY,          KC_BTN5,        U_UND,          U_RDO,
-        TD(U_TD_PST),                                   TD(U_TD_MAC)
+        TD(U_TD_CPYCUT),    KC_NO,          U_UND,          U_RDO,
+        TD(U_TD_PST),                                       TD(U_TD_MAC)
     ),
 
-    // Left hand clipboard layer
+    // Left hand clipboard layer - Mirror of right hand clipboard layer
     [_LCLIP] = LAYOUT(
-        U_RDO,          U_UND,          KC_BTN4,        U_CPY,    
-        TD(U_TD_MAC),                                   TD(U_TD_PST)
+        U_RDO,              U_UND,          KC_NO,          TD(U_TD_CPYCUT),    
+        TD(U_TD_MAC),                                       TD(U_TD_PST)
     ),
-
-    // Scroll layer when drag-scroll is toggled on
+    
+    // Scroll layer - Activated when drag-scroll is toggled on
     [_SCROLL] = LAYOUT(
-        KC_PGUP,        DF(_LEFT),      DF(_RIGHT),     KC_PGUP,
-        KC_PGDN,                                        KC_PGDN
+        KC_PGUP,            DF(_LEFT),      DF(_RIGHT),     KC_PGUP,
+        KC_PGDN,                                            KC_PGDN
     ),
 };
