@@ -19,7 +19,8 @@
 /* TABLE OF CONTENTS
  *  Definitions: Clipboard, Layers, Mac Mode
  *  Tap Dance: Declarations, Helper Functions, Definitions Array
- *  Custom Keycode Handling
+ *  Custom Keycodes: Browser Nav
+ *  Combo Drag Scroll
  *  Keymap Definitions
  */
 

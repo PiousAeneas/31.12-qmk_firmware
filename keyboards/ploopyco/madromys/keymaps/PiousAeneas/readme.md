@@ -1,7 +1,7 @@
 
 # PiousAeneas Custom Adept Keymap
 
-![Custom Keymap](https://github.com/PiousAeneas/qmk_firmware/blob/master/keyboards/ploopyco/madromys/keymaps/PiousAeneas/layout/keyboard-layout-adept-v3.png)
+![Custom Keymap](layout/keyboard-layout-adept-v3.png)
 
 
 To Do:
