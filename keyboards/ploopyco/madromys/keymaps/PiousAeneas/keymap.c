@@ -19,8 +19,7 @@
 /* TABLE OF CONTENTS
  *  Definitions: Clipboard, Layers, Mac Mode
  *  Tap Dance: Declarations, Helper Functions, Definitions Array
- *  Custom Keycodes: Browser Nav
- *  Combo Drag Scroll
+ *  Custom Keycodes: Browser Nav, Combo Scroll
  *  Keymap Definitions
  */
 
@@ -46,6 +45,11 @@ enum layer_names {
 // Boolean to toggle Mac Mode
 bool isMac = false;
 
+// Combo Drag Scroll
+extern bool is_drag_scroll; // External variable from ploopyco.c
+extern int8_t comboscroll_invert; // Used to invert scroll directions for Mac
+static uint16_t timer; // Timer variable for use witn COMBO_SCROLL
+
 // TAP DANCE
 // Tap dance declarations
 enum {
@@ -61,11 +65,13 @@ void u_td_mac_fn(tap_dance_state_t *state, void *user_data) { // 1:Mac, 2:Win
             isMac = true; // Turn on Mac Mode
             keymap_config.swap_lctl_lgui = true; // Swap Left Control and GUI
             keymap_config.swap_rctl_rgui = true; // Swap Right Control and GUI
+            comboscroll_invert = -1; // Invert scroll directions for Mac
             break;
         case 2:
             isMac = false; // Turn off Mac Mode
             keymap_config.swap_lctl_lgui = false;
             keymap_config.swap_rctl_rgui = false;
+            comboscroll_invert = 1; // Return to default scroll directions
             break;
         default:
             break; // Do nothing for unexpected tap counts
@@ -118,6 +124,8 @@ tap_dance_action_t tap_dance_actions[] = {
 // Define custom keycodes
 enum custom_keycodes {
     U_BRWSR_BCK = SAFE_RANGE, U_BRWSR_FWD, // Browser navigation
+    COMBO_SCROLL, // Combo Drag Scroll
+    RET_RGHT, RET_LEFT, // Return to Base layer from Scroll layer
 };
 
 // Custom keycode handling
@@ -137,7 +145,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
         return false; // Skip all further processing of this key
 
-    case LT(_LCLIP, KC_WBAK): // Custom Layer Tap for U_BRWSR_BCK
+    case LT(_LCLIP, KC_WBAK): // Custom Layer Tap for U_BRWSR_BCK (uses Mod-Tap Intercept)
         if (record->tap.count && record->event.pressed) {
             // This is a tap - execute U_BRWSR_BCK functionality
             if (isMac) {
@@ -147,11 +155,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } else {
                 tap_code(KC_WBAK);
             }
-            return false;
+            return false; // Skip all further processing of this key
         }
         return true; // If it's not a tap, let QMK handle the layer toggle
 
-    case LT(_RCLIP, KC_WFWD): // Custom Layer Tap for U_BRWSR_FWD
+    case LT(_RCLIP, KC_WFWD): // Custom Layer Tap for U_BRWSR_FWD (uses Mod-Tap Intercept)
         if (record->tap.count && record->event.pressed) {
             // This is a tap - execute U_BRWSR_FWD functionality
             if (isMac) {
@@ -161,9 +169,31 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } else {
                 tap_code(KC_WFWD);
             }
-            return false;
+            return false; // Skip all further processing of this key
         }
         return true; // If it's not a tap, let QMK handle the layer toggle
+
+    case COMBO_SCROLL: // Turns on drag scroll and Scroll layer on tap, momentary drag scroll on hold
+        if (record->event.pressed) { // on key down
+            timer = timer_read(); // read out the time of key down
+            is_drag_scroll = 1; // turn on drag scroll
+        } else { // on key release
+            if (timer_elapsed(timer) < TAPPING_TERM) { // key was tapped
+                layer_invert(_SCROLL); // toggle Scroll layer
+            } else { // key was held
+                is_drag_scroll = 0; // turn off drag scroll on key release
+            }
+        }
+        return false; // Skip all further processing of this key
+
+    case RET_RGHT:
+    case RET_LEFT:
+        if (record->event.pressed) { // on key down
+            is_drag_scroll = 0; // turn off drag scroll
+            layer_off(_SCROLL); // turn off Scroll layer
+            default_layer_set(1UL << (keycode == RET_RGHT ? _RIGHT : _LEFT)); // set base layer
+        }
+        return false; // Skip all further processing of this key
 
     default:
         return true; // Process all other keycodes normally
@@ -190,13 +220,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     // Default right-handed base layer
     [_RIGHT] = LAYOUT(
-        U_BRWSR_BCK,        LT(_RCLIP,KC_WFWD), DRAG_SCROLL,        KC_BTN2,
+        U_BRWSR_BCK,        LT(_RCLIP,KC_WFWD), COMBO_SCROLL,       KC_BTN2,
         KC_BTN1,                                                    DF(_LEFT)
     ),
 
     // Alternate left-handed base layer
     [_LEFT] = LAYOUT(
-        KC_BTN2,            DRAG_SCROLL,        LT(_LCLIP,KC_WBAK), U_BRWSR_FWD,    
+        KC_BTN2,            COMBO_SCROLL,       LT(_LCLIP,KC_WBAK), U_BRWSR_FWD,    
         DF(_RIGHT),                                                 KC_BTN1
     ),
 
@@ -214,7 +244,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     
     // Scroll layer - Activated when drag-scroll is toggled on
     [_SCROLL] = LAYOUT(
-        KC_PGUP,            DF(_LEFT),          DF(_RIGHT),         KC_PGUP,
+        KC_PGUP,            RET_LEFT,           RET_RGHT,           KC_PGUP,
         KC_PGDN,                                                    KC_PGDN
     ),
 };

@@ -58,6 +58,8 @@
 #    define ENCODER_BUTTON_COL 0
 #endif
 
+int8_t comboscroll_invert = 1; // for use with Mac mode scroll inversion
+
 keyboard_config_t keyboard_config;
 uint16_t          dpi_array[] = PLOOPY_DPI_OPTIONS;
 #define DPI_OPTION_SIZE ARRAY_SIZE(dpi_array)
@@ -134,11 +136,11 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
         scroll_accumulated_v += (float)mouse_report.y / PLOOPY_DRAGSCROLL_DIVISOR_V;
 
         // Assign integer parts of accumulated scroll values to the mouse report
-        mouse_report.h = (int8_t)scroll_accumulated_h;
+        mouse_report.h = comboscroll_invert * (int8_t)scroll_accumulated_h;     // added `comboscroll_invert * ` for Mac mode
 #ifdef PLOOPY_DRAGSCROLL_INVERT
-        mouse_report.v = -(int8_t)scroll_accumulated_v;
+        mouse_report.v = comboscroll_invert * -(int8_t)scroll_accumulated_v;    // added `comboscroll_invert * ` for Mac mode
 #else
-        mouse_report.v = (int8_t)scroll_accumulated_v;
+        mouse_report.v = comboscroll_invert * (int8_t)scroll_accumulated_v;     // added `comboscroll_invert * ` for Mac mode
 #endif
 
         // Update accumulated scroll values by subtracting the integer parts
