@@ -19,7 +19,7 @@
 /* TABLE OF CONTENTS
  *  Definitions: Clipboard, Layers, Mac Mode
  *  Tap Dance: Declarations, Helper Functions, Definitions Array
- *  Custom Keycodes: Browser Nav, Combo Scroll
+ *  Custom Keycodes: Redo, Browser Nav, Combo Scroll
  *  Keymap Definitions
  */
 
@@ -131,6 +131,20 @@ enum custom_keycodes {
 // Custom keycode handling
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
+    // Perform redo action for Mac (Cmd+Shift+Z)
+    case U_RDO:
+        if (record->event.pressed) {
+            if (isMac) {
+                register_code(KC_LCMD);
+                register_code(KC_LSFT);
+                tap_code(KC_Z);
+                unregister_code(KC_LSFT);
+                unregister_code(KC_LCMD);
+                return false;
+            }
+        }
+        return true; // Else use default redo (Windows)
+            
     // Browser navigation with U_BRWSR_BCK and U_BRWSR_FWD
     case U_BRWSR_BCK:
     case U_BRWSR_FWD:
