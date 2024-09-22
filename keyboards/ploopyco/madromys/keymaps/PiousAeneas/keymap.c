@@ -16,12 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* TABLE OF CONTENTS
- *  Definitions: Clipboard, Layers, Mac Mode
- *  Tap Dance: Declarations, Helper Functions, Definitions Array
- *  Custom Keycodes: Redo, Browser Nav, Combo Scroll
- *  Keymap Definitions
- */
+/* CONTENTS
+    1. Definitions: Layers, Clipboard, Mac Mode, Combo Scroll
+    2. Tap Dance:
+        - Declarations - U_TD_MAC, U_TD_CPYCUT, U_TD_PST
+        - Helper Functions - Mac Mode, CopyCut, Paste Special
+        - Definitions Array - U_TD_MAC, U_TD_CPYCUT, U_TD_PST
+    3. Custom Keycodes: U_RDO, U_BRWSR_BCK, U_BRWSR_FWD, COMBO_SCROLL, RET_RGHT, RET_LEFT,
+    4. Keymap Definitions: _RIGHT, _LEFT, _RCLIP, _LCLIP, _SCROLL
+*/
 
 #include QMK_KEYBOARD_H
 
