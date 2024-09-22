@@ -136,6 +136,34 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
         return false; // Skip all further processing of this key
 
+    case LT(_LCLIP, KC_WBAK): // Custom Layer Tap for U_BRWSR_BCK
+        if (record->tap.count && record->event.pressed) {
+            // This is a tap - execute U_BRWSR_BCK functionality
+            if (isMac) {
+                register_code(KC_LGUI);
+                tap_code(KC_LBRC);
+                unregister_code(KC_LGUI);
+            } else {
+                tap_code(KC_WBAK);
+            }
+            return false;
+        }
+        return true; // If it's not a tap, let QMK handle the layer toggle
+
+    case LT(_RCLIP, KC_WFWD): // Custom Layer Tap for U_BRWSR_FWD
+        if (record->tap.count && record->event.pressed) {
+            // This is a tap - execute U_BRWSR_FWD functionality
+            if (isMac) {
+                register_code(KC_LGUI);
+                tap_code(KC_RBRC);
+                unregister_code(KC_LGUI);
+            } else {
+                tap_code(KC_WFWD);
+            }
+            return false;
+        }
+        return true; // If it's not a tap, let QMK handle the layer toggle
+
     default:
         return true; // Process all other keycodes normally
   }
@@ -161,31 +189,31 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     // Default right-handed base layer
     [_RIGHT] = LAYOUT(
-        U_BRWSR_BCK,        U_BRWSR_FWD,    DRAG_SCROLL,    KC_BTN2,
-        KC_BTN1,                                            DF(_LEFT)
+        U_BRWSR_BCK,        LT(_RCLIP,KC_WFWD), DRAG_SCROLL,        KC_BTN2,
+        KC_BTN1,                                                    DF(_LEFT)
     ),
 
     // Alternate left-handed base layer
     [_LEFT] = LAYOUT(
-        KC_BTN2,            DRAG_SCROLL,    U_BRWSR_BCK,    U_BRWSR_FWD,    
-        DF(_RIGHT),                                         KC_BTN1
+        KC_BTN2,            DRAG_SCROLL,        LT(_LCLIP,KC_WBAK), U_BRWSR_FWD,    
+        DF(_RIGHT),                                                 KC_BTN1
     ),
 
     // Right hand clipboard layer - Copy, Cut, Undo, Redo, Paste, and Mac toggle
     [_RCLIP] = LAYOUT(
-        TD(U_TD_CPYCUT),    KC_NO,          U_UND,          U_RDO,
-        TD(U_TD_PST),                                       TD(U_TD_MAC)
+        TD(U_TD_CPYCUT),    KC_NO,              U_UND,              U_RDO,
+        TD(U_TD_PST),                                               TD(U_TD_MAC)
     ),
 
     // Left hand clipboard layer - Mirror of right hand clipboard layer
     [_LCLIP] = LAYOUT(
-        U_RDO,              U_UND,          KC_NO,          TD(U_TD_CPYCUT),    
-        TD(U_TD_MAC),                                       TD(U_TD_PST)
+        U_RDO,              U_UND,              KC_NO,              TD(U_TD_CPYCUT),    
+        TD(U_TD_MAC),                                               TD(U_TD_PST)
     ),
     
     // Scroll layer - Activated when drag-scroll is toggled on
     [_SCROLL] = LAYOUT(
-        KC_PGUP,            DF(_LEFT),      DF(_RIGHT),     KC_PGUP,
-        KC_PGDN,                                            KC_PGDN
+        KC_PGUP,            DF(_LEFT),          DF(_RIGHT),         KC_PGUP,
+        KC_PGDN,                                                    KC_PGDN
     ),
 };
