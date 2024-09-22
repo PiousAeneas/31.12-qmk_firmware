@@ -1,12 +1,12 @@
 
 # Ploopyco Adept Trackball Firmware Files
 
-**PiousAeneas Firmware**:
+[PiousAeneas Firmware](ploopyco_madromys_rev1_001_PiousAeneas.uf2)
 
-**Default Firmware**: `ploopyco_madromys_rev1_001_via_mom_semaphore_4.uf2`
+[Default Firmware](ploopyco_madromys_rev1_001_via_mom_semaphore_4.uf2)
 
 ```c
-/* Ploopy Adept Default Layout
+/* Ploopy Adept Default Layout and keymap.c
  * +---------+-------+-------+---------+
  * |         |       |       |         |
  * | KC_BTN4 |KC_BTN5|DrgScrl| KC_BTN2 |
