@@ -3,14 +3,12 @@
     {
       "a": 5,
       "w": 18.5,
-      "h": 0.75,
       "d": true
     },
-    "<b>Ploopy Adept Keymap</b><br>Ambidextrous and cross-platform with combo drag scroll, browser navigation, and clipboard functions"
+    "<b>Ploopy Adept Keymap</b><br>Ambidextrous and cross-platform with combo drag scroll, browser navigation, and clipboard functions.<br>Tap-Hold configuration indicated by front legend hold function in gray."
   ],
   [
     {
-      "y": -0.25,
       "t": "#000000\n#0e9c14",
       "w": 1.5,
       "h": 2
@@ -20,15 +18,17 @@
       "w": 1.5,
       "h": 1.5
     },
-    "<i>Tap / Hold</i>\nUndo\n\n\nDrag Scroll\n\n<b>SCROLL</b>",
+    "\nUndo\n\n\nDrag Scroll\n\n<b>SCROLL</b>",
     {
       "t": "#000000\n\n\n\n#0e9c14",
+      "a": 7,
       "w": 1.5,
       "h": 1.5
     },
-    "<i>Tap / Hold</i>\n\n\n\n<b>LCLIP</b>\n\nBack",
+    "Back\n\n\n\n<b>LCLIP</b>",
     {
       "t": "#000000\n#0e9c14",
+      "a": 5,
       "w": 1.5,
       "h": 2
     },
@@ -66,16 +66,18 @@
     "\n1:Copy<br>2:Cut\n\n\n\n\nBack",
     {
       "t": "#000000\n\n\n\n#0428c7",
+      "a": 7,
       "w": 1.5,
       "h": 1.5
     },
-    "<i>Tap / Hold</i>\n\n\n\n<b>RCLIP</b>\n\nFwd",
+    "Fwd\n\n\n\n<b>RCLIP</b>",
     {
       "t": "#000000\n#0428c7",
+      "a": 5,
       "w": 1.5,
       "h": 1.5
     },
-    "<i>Tap / Hold</i>\nUndo\n\n\nDrag Scroll\n\n<b>SCROLL</b>",
+    "\nUndo\n\n\nDrag Scroll\n\n<b>SCROLL</b>",
     {
       "w": 1.5,
       "h": 2
@@ -117,7 +119,7 @@
       "h2": 1,
       "y2": 1
     },
-    "\n1:Mac<br>2:Win\n\n\n\n\n<b>RIGHT</b>",
+    "\n1:Mac<br>2:Win\n\n\nBTN3\n\n<b>RIGHT</b>",
     {
       "x": 3,
       "w": 1.5,
@@ -169,6 +171,6 @@
       "x2": -0.75,
       "y2": 1
     },
-    "\n1:Mac<br>2:Win\n\n\n\n\n<b>LEFT</b>"
+    "\n1:Mac<br>2:Win\n\n\nBTN3\n\n<b>LEFT</b>"
   ]
 ]

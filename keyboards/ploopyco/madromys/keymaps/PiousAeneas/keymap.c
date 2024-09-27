@@ -22,7 +22,7 @@
         - Declarations - U_TD_MAC, U_TD_CPYCUT, U_TD_PST
         - Helper Functions - Mac Mode, CopyCut, Paste Special
         - Definitions Array - U_TD_MAC, U_TD_CPYCUT, U_TD_PST
-    3. Custom Keycodes: U_RDO, U_BRWSR_BCK, U_BRWSR_FWD, COMBO_SCROLL, RET_RGHT, RET_LEFT,
+    3. Custom Keycodes: U_RDO, U_BRWSR_BCK/FWD, BTN3, COMBO_SCROLL, RET_RGHT, RET_LEFT
     4. Keymap Definitions: _RIGHT, _LEFT, _RCLIP, _LCLIP, _SCROLL
 */
 
@@ -51,7 +51,7 @@ bool isMac = false;
 // Combo Drag Scroll
 extern bool is_drag_scroll; // External variable from ploopyco.c
 extern int8_t comboscroll_invert; // Used to invert scroll directions for Mac
-static uint16_t timer; // Timer variable for use witn COMBO_SCROLL
+static uint16_t timer; // Timer variable for COMBO_SCROLL
 
 // TAP DANCE
 // Tap dance declarations
@@ -162,33 +162,35 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
         return false; // Skip all further processing of this key
 
-    case LT(_LCLIP, KC_WBAK): // Custom Layer Tap for U_BRWSR_BCK (uses Mod-Tap Intercept)
-        if (record->tap.count && record->event.pressed) {
-            // This is a tap - execute U_BRWSR_BCK functionality
+    // Custom Layer Taps for U_BRWSR_BCK and U_BRWSR_FWD using Mod-Tap Intercept
+    case LT(_LCLIP, KC_WBAK):
+    case LT(_RCLIP, KC_WFWD):
+        if (record->tap.count && record->event.pressed) { // Execute browser nav on tap - copied from above
             if (isMac) {
                 register_code(KC_LGUI);
-                tap_code(KC_LBRC);
+                tap_code(keycode == LT(_LCLIP, KC_WBAK) ? KC_LBRC : KC_RBRC);
                 unregister_code(KC_LGUI);
             } else {
-                tap_code(KC_WBAK);
+                tap_code(keycode == LT(_LCLIP, KC_WBAK) ? KC_WBAK : KC_WFWD);
             }
             return false; // Skip all further processing of this key
         }
         return true; // If it's not a tap, let QMK handle the layer toggle
 
-    case LT(_RCLIP, KC_WFWD): // Custom Layer Tap for U_BRWSR_FWD (uses Mod-Tap Intercept)
-        if (record->tap.count && record->event.pressed) {
-            // This is a tap - execute U_BRWSR_FWD functionality
-            if (isMac) {
-                register_code(KC_LGUI);
-                tap_code(KC_RBRC);
-                unregister_code(KC_LGUI);
+    // Custom Layer Taps for Chirality and Middle Click using Mod-Tap Intercept
+    case LT(_RIGHT, KC_M):
+    case LT(_LEFT, KC_M):
+        if (record->tap.count && record->event.pressed) { // Set default layer to other hand on Tap
+            default_layer_set(1UL << (keycode == LT(_RIGHT, KC_M) ? _RIGHT : _LEFT));
+            return false;
+        } else { // Hold
+            if (record->event.pressed) {
+                register_code(KC_BTN3); // Press middle click on hold
             } else {
-                tap_code(KC_WFWD);
+                unregister_code(KC_BTN3); // Release middle click on release
             }
-            return false; // Skip all further processing of this key
         }
-        return true; // If it's not a tap, let QMK handle the layer toggle
+        return false; // Skip all further processing of this key
 
     case COMBO_SCROLL: // Turns on drag scroll and Scroll layer on tap, momentary drag scroll on hold
         if (record->event.pressed) { // on key down
@@ -203,6 +205,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
         return false; // Skip all further processing of this key
 
+    // Custom keycodes for exiting Scroll layer
     case RET_RGHT:
     case RET_LEFT:
         if (record->event.pressed) { // on key down
@@ -216,8 +219,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         return true; // Process all other keycodes normally
   }
 }
-
-
+    
 // KEYMAP DEFINITIONS
 /* Ploopy Adept Custom Layout = LAYOUT(#1, #2, #3, #4, #5, #6)
  * +---------+-------+-------+---------+
@@ -238,13 +240,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // Default right-handed base layer
     [_RIGHT] = LAYOUT(
         U_BRWSR_BCK,        LT(_RCLIP,KC_WFWD), COMBO_SCROLL,       KC_BTN2,
-        KC_BTN1,                                                    DF(_LEFT)
+        KC_BTN1,                                                    LT(_LEFT, KC_M)
     ),
 
     // Alternate left-handed base layer
     [_LEFT] = LAYOUT(
         KC_BTN2,            COMBO_SCROLL,       LT(_LCLIP,KC_WBAK), U_BRWSR_FWD,    
-        DF(_RIGHT),                                                 KC_BTN1
+        LT(_RIGHT, KC_M),                                           KC_BTN1
     ),
 
     // Right hand clipboard layer - Copy, Cut, Undo, Redo, Paste, and Mac toggle
