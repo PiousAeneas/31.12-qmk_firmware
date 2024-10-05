@@ -1,5 +1,6 @@
 **PiousAeneas Custom Keymaps**:
-- [Ploopy Adept](https://github.com/PiousAeneas/qmk_firmware/tree/master/keyboards/ploopyco/madromys/keymaps/PiousAeneas)
+- [Ploopy Adept](/keyboards/ploopyco/madromys/keymaps/PiousAeneas)
+- [Keyboardio Atreus](/keyboards/keyboardio/atreus/keymaps/PiousAeneas_miryoku)
 
 # Quantum Mechanical Keyboard Firmware
 
