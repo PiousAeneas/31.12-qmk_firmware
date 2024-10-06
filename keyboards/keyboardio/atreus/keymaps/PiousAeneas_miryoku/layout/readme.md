@@ -1,0 +1,1 @@
+Edit keymap by dragging JSON into [Keyboard Layout Editor](http://www.keyboard-layout-editor.com/#/).
