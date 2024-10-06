@@ -55,61 +55,51 @@ void u_td_fn_boot(tap_dance_state_t *state, void *user_data) {
     reset_keyboard();
   }
 }
-
 void u_td_fn_U_BASE(tap_dance_state_t *state, void *user_data) {
   if (state->count == 2) {
     default_layer_set((layer_state_t)1 << U_BASE);
   }
 }
-
 void u_td_fn_U_EXTRA(tap_dance_state_t *state, void *user_data) {
   if (state->count == 2) {
     default_layer_set((layer_state_t)1 << U_EXTRA);
   }
 }
-
 void u_td_fn_U_TAP(tap_dance_state_t *state, void *user_data) {
   if (state->count == 2) {
     default_layer_set((layer_state_t)1 << U_TAP);
   }
 }
-
 void u_td_fn_U_BUTTON(tap_dance_state_t *state, void *user_data) {
   if (state->count == 2) {
     default_layer_set((layer_state_t)1 << U_BUTTON);
   }
 }
-
 void u_td_fn_U_NAV(tap_dance_state_t *state, void *user_data) {
   if (state->count == 2) {
     default_layer_set((layer_state_t)1 << U_NAV);
   }
 }
-
 void u_td_fn_U_MOUSE(tap_dance_state_t *state, void *user_data) {
   if (state->count == 2) {
     default_layer_set((layer_state_t)1 << U_MOUSE);
   }
 }
-
 void u_td_fn_U_MEDIA(tap_dance_state_t *state, void *user_data) {
   if (state->count == 2) {
     default_layer_set((layer_state_t)1 << U_MEDIA);
   }
 }
-
 void u_td_fn_U_NUM(tap_dance_state_t *state, void *user_data) {
   if (state->count == 2) {
     default_layer_set((layer_state_t)1 << U_NUM);
   }
 }
-
 void u_td_fn_U_SYM(tap_dance_state_t *state, void *user_data) {
   if (state->count == 2) {
     default_layer_set((layer_state_t)1 << U_SYM);
   }
 }
-
 void u_td_fn_U_FUN(tap_dance_state_t *state, void *user_data) {
   if (state->count == 2) {
     default_layer_set((layer_state_t)1 << U_FUN);
@@ -228,6 +218,7 @@ tap_dance_action_t tap_dance_actions[] = {
 enum custom_keycodes {
     U_TABB = SAFE_RANGE, U_TABF, // Tab navigation
     U_BRWSR_BCK, U_BRWSR_FWD, // Browser navigation
+    U_WH_L, U_WH_D, U_WH_U, U_WH_R, // Mouse scrolling
     U_SEARCH, // "Spotlight" search
     U_MDASH, // Em Dash
     U_XWIN, U_XFRZ, // Excel Shortcuts: New Window, Freeze Panes
@@ -280,6 +271,36 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 } else {
                     tap_code(keycode == U_BRWSR_BCK ? KC_WBAK : KC_WFWD); // Tap Browser Back for U_BRWSR_BCK or Browser Forward for U_BRWSR_FWD
                 }
+            }
+            return false;
+
+        // Reverse mouse scrolling directions when in Mac mode
+        case U_WH_L:
+            if (record->event.pressed) {
+                register_code(isMac ? KC_WH_R : KC_WH_L);
+            } else {
+                unregister_code(isMac ? KC_WH_R : KC_WH_L);
+            }
+            return false;
+        case U_WH_D:
+            if (record->event.pressed) {
+                register_code(isMac ? KC_WH_U : KC_WH_D);
+            } else {
+                unregister_code(isMac ? KC_WH_U : KC_WH_D);
+            }
+            return false;
+        case U_WH_U:
+            if (record->event.pressed) {
+                register_code(isMac ? KC_WH_D : KC_WH_U);
+            } else {
+                unregister_code(isMac ? KC_WH_D : KC_WH_U);
+            }
+            return false;
+        case U_WH_R:
+            if (record->event.pressed) {
+                register_code(isMac ? KC_WH_L : KC_WH_R);
+            } else {
+                unregister_code(isMac ? KC_WH_L : KC_WH_R);
             }
             return false;
 
@@ -362,12 +383,45 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
-// Key Overrides
-const key_override_t capsword_key_override = ko_make_basic(MOD_MASK_SHIFT, CW_TOGG, KC_CAPS); // Shift + Caps Word = Caps Lock
+// Permissive Hold per Key Settings: Off for pinky and ring finger HRM
+bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        // Exceptions to Permissive Hold.
+        case LGUI_T(KC_A): // Home row mods for BASE
+        case LALT_T(KC_R):
+        case LALT_T(KC_I):
+        case LGUI_T(KC_O):
+        case LALT_T(KC_S): // Home row mods for QWERTY
+        case LALT_T(KC_L):
+        case LGUI_T(KC_QUOT):
+            return false;
+        default:
+            // Defualit is to select the hold action when another key is tapped.
+            return true; // 
+    }
+}
 
-const key_override_t *key_overrides[] = { // This globally defines all key overrides to be used
-    &capsword_key_override
-};
+// Caps Word modifications
+bool caps_word_press_user(uint16_t keycode) {
+    switch (keycode) {
+        // Keycodes that continue Caps Word, with shift applied.
+        case KC_A ... KC_Z:
+            add_weak_mods(MOD_BIT(KC_LSFT));  // Apply shift to next key.
+            return true;
+
+        // Keycodes that continue Caps Word, without shifting.
+        case KC_1 ... KC_0:
+        case KC_BSPC:
+        case KC_DEL:
+        case KC_UNDS:
+        case KC_MINS:
+        case KC_DOT:
+            return true;
+
+        default:
+            return false;  // Deactivate Caps Word.
+    }
+}
 
 // ***KEYMAP DEFINITIONS***
 
@@ -412,7 +466,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [U_MOUSE] = LAYOUT(
     TD(U_TD_BOOT),      TD(U_TD_U_TAP), TD(U_TD_U_EXTRA), TD(U_TD_U_BASE),    KC_ACL2,                                                U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
     KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,            KC_ACL1,                                                KC_CAPS,            KC_MS_L,          KC_MS_D,          KC_MS_U,        KC_MS_R,
-    KC_NO,              KC_ALGR,        TD(U_TD_U_SYM),   TD(U_TD_U_MOUSE),   KC_ACL0,          KC_NO,              KC_NO,            KC_NO,              KC_WH_L,          KC_WH_D,          KC_WH_U,        KC_WH_R,
+    KC_NO,              KC_ALGR,        TD(U_TD_U_SYM),   TD(U_TD_U_MOUSE),   KC_ACL0,          KC_NO,              KC_NO,            KC_NO,              U_WH_L,           U_WH_D,           U_WH_U,         U_WH_R,
     KC_NO,              KC_NO,          KC_NO,            KC_NO,              KC_NO,            KC_NO,              KC_BTN2,          KC_BTN1,            KC_BTN3,          KC_NO,            KC_NO,          KC_NO
   ),
 

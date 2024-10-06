@@ -4,13 +4,8 @@
 #pragma once
 
 #define CAPS_WORD_INVERT_ON_SHIFT // Holding Shift continues Caps Word but inverts the shift state
-#define PERMISSIVE_HOLD // Selects the hold action when another key is pressed and then released while the dual-role key is held down, even if within the tapping term
+#define PERMISSIVE_HOLD_PER_KEY // Selects the hold action when another key is pressed and then released even within the tapping term
 #define MK_COMBINED // Enables momentary keys to set mouse speed to different constants
-
-// Optimizations to reduce firmware size: https://thomasbaart.nl/2018/12/01/reducing-firmware-size-in-qmk/
-#define NO_ACTION_MACRO     // Required for LTO. Disables deprecated action_get_macro method and M(id) keycodes.
-#define NO_ACTION_FUNCTION  // Required for LTO. Disables deprecated action_function method and AF(id) keycodes.
-#define DISABLE_LEADER
 
 #define TAPPING_TERM 200 // Reiterates default value.
 #define QUICK_TAP_TERM 0 // Disables auto-repeat after quick tap for faster home row mods.
