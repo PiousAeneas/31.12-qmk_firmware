@@ -8,11 +8,10 @@
 enum miryoku_layers {
     U_BASE,
     U_EXTRA,
-    U_TAP,
     U_BUTTON,
     U_NAV,
     U_MOUSE,
-    U_MEDIA,
+    U_SYS,
     U_NUM,
     U_SYM,
     U_FUN
@@ -30,80 +29,70 @@ bool isMac = false;
 // ***TAP DANCE***
 // Tap dance declarations
 enum {
-    // Double tap guard for Additional Features
-    U_TD_BOOT,
-    U_TD_U_BASE,
-    U_TD_U_EXTRA,
-    U_TD_U_TAP,
-    U_TD_U_BUTTON,
-    U_TD_U_NAV,
+    U_TD_U_NAV, // Layer Locks
     U_TD_U_MOUSE,
-    U_TD_U_MEDIA,
+    U_TD_U_SYS,
     U_TD_U_NUM,
     U_TD_U_SYM,
     U_TD_U_FUN,
-    
+    U_TD_U_EXTRA, // Extra layer
     U_TD_MAC, U_TD_WIN, // Mac Mode
     U_TD_PST, // Paste Special
     U_TD_PSCR, // Screenshot
 };
 
 // Tap dance helper functions
-// Tap dance helper functions: Additional Features double tap guard
-void u_td_fn_boot(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    reset_keyboard();
-  }
-}
-void u_td_fn_U_BASE(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    default_layer_set((layer_state_t)1 << U_BASE);
-  }
-}
-void u_td_fn_U_EXTRA(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    default_layer_set((layer_state_t)1 << U_EXTRA);
-  }
-}
-void u_td_fn_U_TAP(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    default_layer_set((layer_state_t)1 << U_TAP);
-  }
-}
-void u_td_fn_U_BUTTON(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    default_layer_set((layer_state_t)1 << U_BUTTON);
-  }
-}
+// Tap dance helper functions: Layer Locks
 void u_td_fn_U_NAV(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    default_layer_set((layer_state_t)1 << U_NAV);
-  }
+    if (state->count == 1) {
+        default_layer_set((layer_state_t)1 << U_NAV); // Same layer on single tap
+    } else if (state->count == 2) {
+        default_layer_set((layer_state_t)1 << U_NUM); // Opposite layer on double tap
+    }
 }
 void u_td_fn_U_MOUSE(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    default_layer_set((layer_state_t)1 << U_MOUSE);
-  }
+    if (state->count == 1) {
+        default_layer_set((layer_state_t)1 << U_MOUSE); // Same layer on single tap
+    } else if (state->count == 2) {
+        default_layer_set((layer_state_t)1 << U_SYM); // Opposite layer on double tap
+    }
 }
-void u_td_fn_U_MEDIA(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    default_layer_set((layer_state_t)1 << U_MEDIA);
-  }
+void u_td_fn_U_SYS(tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        default_layer_set((layer_state_t)1 << U_SYS); // Same layer on single tap
+    } else if (state->count == 2) {
+        default_layer_set((layer_state_t)1 << U_FUN); // Opposite layer on double tap
+    }
 }
 void u_td_fn_U_NUM(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    default_layer_set((layer_state_t)1 << U_NUM);
-  }
+    if (state->count == 1) {
+        default_layer_set((layer_state_t)1 << U_NUM); // Same layer on single tap
+    } else if (state->count == 2) {
+        default_layer_set((layer_state_t)1 << U_NAV); // Opposite layer on double tap
+    }
 }
 void u_td_fn_U_SYM(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    default_layer_set((layer_state_t)1 << U_SYM);
-  }
+    if (state->count == 1) {
+        default_layer_set((layer_state_t)1 << U_SYM); // Same layer on single tap
+    } else if (state->count == 2) {
+        default_layer_set((layer_state_t)1 << U_MOUSE); // Opposite layer on double tap
+    }
 }
 void u_td_fn_U_FUN(tap_dance_state_t *state, void *user_data) {
-  if (state->count == 2) {
-    default_layer_set((layer_state_t)1 << U_FUN);
-  }
+    if (state->count == 1) {
+        default_layer_set((layer_state_t)1 << U_FUN); // Same layer on single tap
+    } else if (state->count == 2) {
+        default_layer_set((layer_state_t)1 << U_SYS); // Opposite layer on double tap
+    }
+}
+
+// Tap dance helper functions: Base / Extra Layer
+void u_td_fn_U_EXTRA(tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        default_layer_set((layer_state_t)1 << U_BASE); // Base layer on single tap
+    } else if (state->count == 2) {
+        default_layer_set((layer_state_t)1 << U_EXTRA); // Extra layer on double tap
+    }
 }
 
 // Tap dance helper functions: Mac Mode
@@ -185,19 +174,17 @@ void u_td_pscr_fn(tap_dance_state_t *state, void *user_data) {
 // TAP DANCE ACTIONS ARRAY
 tap_dance_action_t tap_dance_actions[] = {
 
-    // Additional Features double tap guard
-    [U_TD_BOOT]     = ACTION_TAP_DANCE_FN(u_td_fn_boot),
-    [U_TD_U_BASE]   = ACTION_TAP_DANCE_FN(u_td_fn_U_BASE),
-    [U_TD_U_EXTRA]  = ACTION_TAP_DANCE_FN(u_td_fn_U_EXTRA),
-    [U_TD_U_TAP]    = ACTION_TAP_DANCE_FN(u_td_fn_U_TAP),
-    [U_TD_U_BUTTON] = ACTION_TAP_DANCE_FN(u_td_fn_U_BUTTON),
+    // Layer Locks
     [U_TD_U_NAV]    = ACTION_TAP_DANCE_FN(u_td_fn_U_NAV),
     [U_TD_U_MOUSE]  = ACTION_TAP_DANCE_FN(u_td_fn_U_MOUSE),
-    [U_TD_U_MEDIA]  = ACTION_TAP_DANCE_FN(u_td_fn_U_MEDIA),
+    [U_TD_U_SYS]    = ACTION_TAP_DANCE_FN(u_td_fn_U_SYS),
     [U_TD_U_NUM]    = ACTION_TAP_DANCE_FN(u_td_fn_U_NUM),
     [U_TD_U_SYM]    = ACTION_TAP_DANCE_FN(u_td_fn_U_SYM),
     [U_TD_U_FUN]    = ACTION_TAP_DANCE_FN(u_td_fn_U_FUN),
 
+    // Extra Alphas
+    [U_TD_U_EXTRA]  = ACTION_TAP_DANCE_FN(u_td_fn_U_EXTRA),
+    
     // Mac Mode
     [U_TD_MAC]      = ACTION_TAP_DANCE_FN(u_td_mac_fn),
     [U_TD_WIN]      = ACTION_TAP_DANCE_FN(u_td_win_fn),
@@ -383,21 +370,27 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
-// Permissive Hold per Key Settings: Off for pinky and ring finger HRM
+
+// Permissive Hold only for home-row shift and layer tap-holds
 bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        // Exceptions to Permissive Hold.
-        case LGUI_T(KC_A): // Home row mods for BASE
-        case LALT_T(KC_R):
-        case LALT_T(KC_I):
-        case LGUI_T(KC_O):
-        case LALT_T(KC_S): // Home row mods for QWERTY
-        case LALT_T(KC_L):
-        case LGUI_T(KC_QUOT):
-            return false;
+        case LSFT_T(KC_T): // Base Colemak-DH home-row left shift
+        case RSFT_T(KC_N): // Base Colemak-DH home-row right shift
+        case LSFT_T(KC_F): // Extra QWERTY home-row left shift
+        case RSFT_T(KC_J): // Extra QWERTY home-row right shift
+        case LT(U_BUTTON,KC_Z): // Layer tap-holds for Base and Extra
+        case LT(U_BUTTON,KC_SLSH):
+        case LT(U_SYS,KC_ESC):
+        case LT(U_NAV,KC_SPC):
+        case LT(U_MOUSE,KC_TAB):
+        case LT(U_SYM,KC_ENT):
+        case LT(U_NUM,KC_BSPC):
+        case LT(U_FUN,KC_DEL):
+            // Immediately select the hold action when another key is tapped.
+            return true;
         default:
-            // Defualit is to select the hold action when another key is tapped.
-            return true; // 
+            // Do not select the hold action when another key is tapped.
+            return false;
     }
 }
 
@@ -429,74 +422,67 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 
   [U_BASE] = LAYOUT( // Colemak-DH
-    KC_Q,               KC_W,           KC_F,             KC_P,               KC_B,                                                   KC_J,               KC_L,             KC_U,             KC_Y,           KC_QUOT,
-    LGUI_T(KC_A),       LALT_T(KC_R),   LCTL_T(KC_S),     LSFT_T(KC_T),       KC_G,                                                   KC_M,               LSFT_T(KC_N),     LCTL_T(KC_E),     LALT_T(KC_I),   LGUI_T(KC_O),
-    LT(U_BUTTON,KC_Z),  ALGR_T(KC_X),   KC_C,             KC_D,               KC_V,             KC_NO,              KC_NO,            KC_K,               KC_H,             KC_COMM,          ALGR_T(KC_DOT), LT(U_BUTTON,KC_SLSH),
-    KC_NO,              KC_NO,          KC_NO,            LT(U_MEDIA,KC_ESC), LT(U_NAV,KC_SPC), LT(U_MOUSE,KC_TAB), LT(U_SYM,KC_ENT), LT(U_NUM,KC_BSPC),  LT(U_FUN,KC_DEL), KC_NO,            KC_NO,          KC_NO
+    RGUI_T(KC_Q),       ALGR_T(KC_W),   RCTL_T(KC_F),     RSFT_T(KC_P),     KC_B,                                                   KC_J,               LSFT_T(KC_L),     LCTL_T(KC_U),     ALGR_T(KC_Y),   LGUI_T(KC_QUOT),
+    LGUI_T(KC_A),       LALT_T(KC_R),   LCTL_T(KC_S),     LSFT_T(KC_T),     KC_G,                                                   KC_M,               RSFT_T(KC_N),     RCTL_T(KC_E),     LALT_T(KC_I),   RGUI_T(KC_O),
+    LT(U_BUTTON,KC_Z),  KC_X,           KC_C,             KC_D,             KC_V,             KC_NO,              KC_NO,            KC_K,               KC_H,             KC_COMM,          KC_DOT,         LT(U_BUTTON,KC_SLSH),
+    KC_NO,              KC_NO,          KC_NO,            LT(U_SYS,KC_ESC), LT(U_NAV,KC_SPC), LT(U_MOUSE,KC_TAB), LT(U_SYM,KC_ENT), LT(U_NUM,KC_BSPC),  LT(U_FUN,KC_DEL), KC_NO,            KC_NO,          KC_NO
   ),
 
   [U_EXTRA] = LAYOUT( // QWERTY
-    KC_Q,               KC_W,           KC_E,             KC_R,               KC_T,                                                   KC_Y,               KC_U,             KC_I,             KC_O,           KC_P,
-    LGUI_T(KC_A),       LALT_T(KC_S),   LCTL_T(KC_D),     LSFT_T(KC_F),       KC_G,                                                   KC_H,               LSFT_T(KC_J),     LCTL_T(KC_K),     LALT_T(KC_L),   LGUI_T(KC_QUOT),
-    LT(U_BUTTON,KC_Z),  ALGR_T(KC_X),   KC_C,             KC_V,               KC_B,             KC_NO,              KC_NO,            KC_N,               KC_M,             KC_COMM,          ALGR_T(KC_DOT), LT(U_BUTTON,KC_SLSH),
-    KC_NO,              KC_NO,          KC_NO,            LT(U_MEDIA,KC_ESC), LT(U_NAV,KC_SPC), LT(U_MOUSE,KC_TAB), LT(U_SYM,KC_ENT), LT(U_NUM,KC_BSPC),  LT(U_FUN,KC_DEL), KC_NO,            KC_NO,          KC_NO
-  ),
-
-  [U_TAP] = LAYOUT( // QWERTY
-    KC_Q,               KC_W,           KC_E,             KC_R,               KC_T,                                                   KC_Y,               KC_U,             KC_I,             KC_O,           KC_P,
-    KC_A,               KC_S,           KC_D,             KC_F,               KC_G,                                                   KC_H,               KC_J,             KC_K,             KC_L,           KC_QUOT,
-    KC_Z,               KC_X,           KC_C,             KC_V,               KC_B,             KC_NO,              KC_NO,            KC_N,               KC_M,             KC_COMM,          KC_DOT,         KC_SLSH,
-    KC_NO,              KC_NO,          KC_NO,            KC_ESC,             KC_SPC,           KC_TAB,             KC_ENT,           KC_BSPC,            KC_DEL,           KC_NO,            KC_NO,          KC_NO
+    RGUI_T(KC_Q),       ALGR_T(KC_W),   RCTL_T(KC_E),     RSFT_T(KC_R),     KC_T,                                                   KC_Y,               LSFT_T(KC_U),     LCTL_T(KC_I),     ALGR_T(KC_O),   LGUI_T(KC_P),
+    LGUI_T(KC_A),       LALT_T(KC_S),   LCTL_T(KC_D),     LSFT_T(KC_F),     KC_G,                                                   KC_H,               RSFT_T(KC_J),     RCTL_T(KC_K),     LALT_T(KC_L),   RGUI_T(KC_QUOT),
+    LT(U_BUTTON,KC_Z),  KC_X,           KC_C,             KC_V,             KC_B,             KC_NO,              KC_NO,            KC_N,               KC_M,             KC_COMM,          KC_DOT,         LT(U_BUTTON,KC_SLSH),
+    KC_NO,              KC_NO,          KC_NO,            LT(U_SYS,KC_ESC), LT(U_NAV,KC_SPC), LT(U_MOUSE,KC_TAB), LT(U_SYM,KC_ENT), LT(U_NUM,KC_BSPC),  LT(U_FUN,KC_DEL), KC_NO,            KC_NO,          KC_NO
   ),
 
   [U_BUTTON] = LAYOUT(
-    U_UND,              U_CUT,          U_CPY,            U_PST,              U_RDO,                                                  U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
-    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,            KC_NO,                                                  KC_NO,              KC_LSFT,          KC_LCTL,          KC_LALT,        KC_LGUI,
-    U_UND,              U_CUT,          U_CPY,            U_PST,              U_RDO,            KC_NO,              KC_NO,            U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
-    KC_NO,              KC_NO,          KC_NO,            KC_BTN3,            KC_BTN1,          KC_BTN2,            KC_BTN2,          KC_BTN1,            KC_BTN3,          KC_NO,            KC_NO,          KC_NO
+    U_UND,              U_CUT,          U_CPY,            U_PST,            U_RDO,                                                  U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
+    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,          U_UND,                                                  U_UND,              KC_LSFT,          KC_LCTL,          KC_LALT,        KC_LGUI,
+    U_UND,              U_CUT,          U_CPY,            U_PST,            U_RDO,            KC_NO,              KC_NO,            U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
+    KC_NO,              KC_NO,          KC_NO,            KC_BTN3,          KC_BTN1,          KC_BTN2,            KC_BTN2,          KC_BTN1,            KC_BTN3,          KC_NO,            KC_NO,          KC_NO
   ),
 
   [U_NAV] = LAYOUT(
-    TD(U_TD_BOOT),      TD(U_TD_U_TAP), TD(U_TD_U_EXTRA), TD(U_TD_U_BASE),    KC_NO,                                                  U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
-    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,            KC_NO,                                                  CW_TOGG,            KC_LEFT,          KC_DOWN,          KC_UP,          KC_RGHT,
-    KC_NO,              KC_ALGR,        TD(U_TD_U_NUM),   TD(U_TD_U_NAV),     KC_NO,            KC_NO,              KC_NO,            KC_INS,             KC_HOME,          KC_PGDN,          KC_PGUP,        KC_END,
-    KC_NO,              KC_NO,          KC_NO,            KC_NO,              KC_NO,            KC_NO,              KC_ENT,           KC_BSPC,            KC_DEL,           KC_NO,            KC_NO,          KC_NO
+    KC_RGUI,            KC_ALGR,        KC_RCTL,          KC_RSFT,          KC_NO,                                                  U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
+    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,          KC_NO,                                                  CW_TOGG,            KC_LEFT,          KC_DOWN,          KC_UP,          KC_RGHT,
+    KC_NO,              KC_NO,          TD(U_TD_U_NAV),   TD(U_TD_U_EXTRA), KC_NO,            KC_NO,              KC_NO,            KC_INS,             KC_HOME,          KC_PGDN,          KC_PGUP,        KC_END,
+    KC_NO,              KC_NO,          KC_NO,            KC_NO,            KC_NO,            KC_NO,              KC_ENT,           KC_BSPC,            KC_DEL,           KC_NO,            KC_NO,          KC_NO
   ),
 
   [U_MOUSE] = LAYOUT(
-    TD(U_TD_BOOT),      TD(U_TD_U_TAP), TD(U_TD_U_EXTRA), TD(U_TD_U_BASE),    KC_ACL2,                                                U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
-    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,            KC_ACL1,                                                KC_CAPS,            KC_MS_L,          KC_MS_D,          KC_MS_U,        KC_MS_R,
-    KC_NO,              KC_ALGR,        TD(U_TD_U_SYM),   TD(U_TD_U_MOUSE),   KC_ACL0,          KC_NO,              KC_NO,            KC_NO,              U_WH_L,           U_WH_D,           U_WH_U,         U_WH_R,
-    KC_NO,              KC_NO,          KC_NO,            KC_NO,              KC_NO,            KC_NO,              KC_BTN2,          KC_BTN1,            KC_BTN3,          KC_NO,            KC_NO,          KC_NO
+    KC_RGUI,            KC_ALGR,        KC_RCTL,          KC_RSFT,          KC_ACL2,                                                U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
+    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,          KC_ACL1,                                                KC_CAPS,            KC_MS_L,          KC_MS_D,          KC_MS_U,        KC_MS_R,
+    KC_NO,              KC_NO,          TD(U_TD_U_MOUSE), TD(U_TD_U_EXTRA), KC_ACL0,          KC_NO,              KC_NO,            KC_NO,              U_WH_L,           U_WH_D,           U_WH_U,         U_WH_R,
+    KC_NO,              KC_NO,          KC_NO,            KC_NO,            KC_NO,            KC_NO,              KC_BTN2,          KC_BTN1,            KC_BTN3,          KC_NO,            KC_NO,          KC_NO
   ),
 
-  [U_MEDIA] = LAYOUT(
-    TD(U_TD_BOOT),      TD(U_TD_U_TAP), TD(U_TD_U_EXTRA), TD(U_TD_U_BASE),    KC_NO,                                                  U_XWIN,             U_BRWSR_BCK,      U_TABB,           U_TABF,         U_BRWSR_FWD,
-    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,            KC_NO,                                                  U_SEARCH,           KC_MPRV,          KC_VOLD,          KC_VOLU,        KC_MNXT,
-    TD(U_TD_WIN),       KC_ALGR,        TD(U_TD_U_FUN),   TD(U_TD_U_MEDIA),   TD(U_TD_MAC),     KC_NO,              KC_NO,            U_XFRZ,             U_XOUT,           U_XDECDEC,        U_XDECINC,      U_XIND,
-    KC_NO,              KC_NO,          KC_NO,            KC_NO,              KC_NO,            KC_NO,              KC_MSTP,          KC_MPLY,            KC_MUTE,          KC_NO,            KC_NO,          KC_NO
+  [U_SYS] = LAYOUT(
+    KC_RGUI,            KC_ALGR,        KC_RCTL,          KC_RSFT,          KC_NO,                                                  U_XWIN,             U_BRWSR_BCK,      U_TABB,           U_TABF,         U_BRWSR_FWD,
+    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,          KC_NO,                                                  U_SEARCH,           KC_MPRV,          KC_VOLD,          KC_VOLU,        KC_MNXT,
+    TD(U_TD_WIN),       KC_NO,          TD(U_TD_U_SYS),   TD(U_TD_U_EXTRA), TD(U_TD_MAC),     KC_NO,              KC_NO,            U_XFRZ,             U_XOUT,           U_XDECDEC,        U_XDECINC,      U_XIND,
+    KC_NO,              KC_NO,          KC_NO,            KC_NO,            KC_NO,            KC_NO,              KC_MSTP,          KC_MPLY,            KC_MUTE,          KC_NO,            KC_NO,          KC_NO
 
   ),
 
   [U_NUM] = LAYOUT(
-    KC_LBRC,            KC_7,           KC_8,             KC_9,               KC_RBRC,                                                KC_NO,              TD(U_TD_U_BASE),  TD(U_TD_U_EXTRA), TD(U_TD_U_TAP), TD(U_TD_BOOT),
-    KC_SCLN,            KC_4,           KC_5,             KC_6,               KC_EQL,                                                 KC_SPC,             KC_LSFT,          KC_LCTL,          KC_LALT,        KC_LGUI,
-    KC_GRV,             KC_1,           KC_2,             KC_3,               KC_BSLS,          KC_NO,              KC_NO,            KC_NO,              TD(U_TD_U_NUM),   TD(U_TD_U_NAV),   KC_ALGR,        KC_SLSH,
-    KC_NO,              KC_NO,          KC_NO,            KC_DOT,             KC_0,             KC_MINS,            KC_NO,            KC_NO,              KC_NO,            KC_NO,            KC_NO,          KC_NO
+    KC_LBRC,            KC_7,           KC_8,             KC_9,             KC_RBRC,                                                KC_NO,              KC_LSFT,          KC_LCTL,          KC_ALGR,        KC_LGUI,
+    KC_SCLN,            KC_4,           KC_5,             KC_6,             KC_EQL,                                                 KC_SPC,             KC_RSFT,          KC_RCTL,          KC_LALT,        KC_RGUI,
+    KC_GRV,             KC_1,           KC_2,             KC_3,             KC_BSLS,          KC_NO,              KC_NO,            KC_NO,              TD(U_TD_U_EXTRA), TD(U_TD_U_NUM),   KC_DOT,         KC_SLSH,
+    KC_NO,              KC_NO,          KC_NO,            KC_DOT,           KC_0,             KC_MINS,            KC_NO,            KC_NO,              KC_NO,            KC_NO,            KC_NO,          KC_NO
   ),
 
   [U_SYM] = LAYOUT(
-    KC_LCBR,            KC_AMPR,        KC_ASTR,          KC_LPRN,            KC_RCBR,                                                KC_NO,              TD(U_TD_U_BASE),  TD(U_TD_U_EXTRA), TD(U_TD_U_TAP), TD(U_TD_BOOT),
-    KC_COLN,            KC_DLR,         KC_PERC,          KC_CIRC,            KC_PLUS,                                                KC_SPC,             KC_LSFT,          KC_LCTL,          KC_LALT,        KC_LGUI,
-    KC_TILD,            KC_EXLM,        KC_AT,            KC_HASH,            KC_PIPE,          KC_NO,              KC_NO,            KC_NO,              TD(U_TD_U_SYM),   TD(U_TD_U_MOUSE), KC_ALGR,        KC_SLSH,
-    KC_NO,              KC_NO,          KC_NO,            KC_LPRN,            KC_RPRN,          U_MDASH,            KC_NO,            KC_NO,              KC_NO,            KC_NO,            KC_NO,          KC_NO
+    KC_LCBR,            KC_AMPR,        KC_ASTR,          KC_LPRN,          KC_RCBR,                                                KC_NO,              KC_LSFT,          KC_LCTL,          KC_ALGR,        KC_LGUI,
+    KC_COLN,            KC_DLR,         KC_PERC,          KC_CIRC,          KC_PLUS,                                                KC_SPC,             KC_RSFT,          KC_RCTL,          KC_LALT,        KC_RGUI,
+    KC_TILD,            KC_EXLM,        KC_AT,            KC_HASH,          KC_PIPE,          KC_NO,              KC_NO,            KC_NO,              TD(U_TD_U_EXTRA), TD(U_TD_U_SYM),   KC_DOT,         KC_SLSH,
+    KC_NO,              KC_NO,          KC_NO,            KC_LPRN,          KC_RPRN,          U_MDASH,            KC_NO,            KC_NO,              KC_NO,            KC_NO,            KC_NO,          KC_NO
   ),
 
   [U_FUN] = LAYOUT(
-    KC_F12,             KC_F7,          KC_F8,            KC_F9,              TD(U_TD_PSCR),                                          KC_NO,              TD(U_TD_U_BASE),  TD(U_TD_U_EXTRA), TD(U_TD_U_TAP), TD(U_TD_BOOT),
-    KC_F11,             KC_F4,          KC_F5,            KC_F6,              KC_SCRL,                                                KC_NO,              KC_LSFT,          KC_LCTL,          KC_LALT,        KC_LGUI,
-    KC_F10,             KC_F1,          KC_F2,            KC_F3,              KC_PAUS,          KC_NO,              KC_NO,            KC_NO,              TD(U_TD_U_FUN),   TD(U_TD_U_MEDIA), KC_ALGR,        KC_NO,
-    KC_NO,              KC_NO,          KC_NO,            KC_APP,             KC_SPC,           KC_TAB,             KC_NO,            KC_NO,              KC_NO,            KC_NO,            KC_NO,          KC_NO
+    KC_F12,             KC_F7,          KC_F8,            KC_F9,            TD(U_TD_PSCR),                                          KC_NO,              KC_LSFT,          KC_LCTL,          KC_ALGR,        KC_LGUI,
+    KC_F11,             KC_F4,          KC_F5,            KC_F6,            KC_SCRL,                                                KC_NO,              KC_RSFT,          KC_RCTL,          KC_LALT,        KC_RGUI,
+    KC_F10,             KC_F1,          KC_F2,            KC_F3,            KC_PAUS,          KC_NO,              KC_NO,            KC_NO,              TD(U_TD_U_EXTRA), TD(U_TD_U_FUN),   KC_NO,          KC_NO,
+    KC_NO,              KC_NO,          KC_NO,            KC_APP,           KC_SPC,           KC_TAB,             KC_NO,            KC_NO,              KC_NO,            KC_NO,            KC_NO,          KC_NO
   ),
 
 };

@@ -2,11 +2,23 @@
 
 ![Custom Keymap](layout/keyboard-layout-PiousAeneas-miryoku.png)
 
-A custom keyboard layout adapted heavily from Manna Harbour's [Miryoku](https://github.com/manna-harbour/miryoku) layout. Compile firmware by typing: `qmk compile -kb keyboardio/atreus -km PiousAeneas_miryoku`.
+A custom keyboard layout adapted heavily from Manna Harbour's [Miryoku](https://github.com/manna-harbour/miryoku) layout. Compile firmware by typing: `qmk compile -kb keyboardio/atreus -km PiousAeneas_miryoku`. Details:
 
-## Changes vs. Standard Miryoku
+## Base Alpha Layer
+- **Permissive Hold** for home-row shifts and layer tap-holds (Sys, Nav, Mouse, Sym, Num, Fun, Button).
+- Alternate **Extra** layer uses QWERTY alphas and can be accessed via same-hand layer double-tap. 
 
-1. Caps: Added Caps Lock on Mouse layer, removed Caps Lock on Shifted Caps Word because of issues with the key override feature.
-2. Turned on Permissive Hold with the exception of ring and pinky finger home-row mods.
+## Navigation Layer
+- **Caps Word** only for alphas. Ignores KC_0--KC_9, KC_BSPC, KC_DEL, KC_UNDS, KC_MINS, and KC_DOT. Caps Word also disables itself if the keyboard is idle for 5 seconds.
 
-## Base Layer
+## Mouse Layer
+
+## System Layer
+
+## Number Layer
+
+## Symbol Layer
+
+## Function Layer
+
+## Button Layer
