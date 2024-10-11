@@ -14,7 +14,8 @@ enum miryoku_layers {
     U_SYS,
     U_NUM,
     U_SYM,
-    U_FUN
+    U_FUN,
+    U_NUMPAD
 };
 
 // Define default Windows clipboard actions. U_PST defined in Tap Dance section.
@@ -29,16 +30,16 @@ bool isMac = false;
 // ***TAP DANCE***
 // Tap dance declarations
 enum {
-    U_TD_U_NAV, // Layer Locks
+    U_TD_U_NAV,     // Layer Locks
     U_TD_U_MOUSE,
     U_TD_U_SYS,
     U_TD_U_NUM,
     U_TD_U_SYM,
     U_TD_U_FUN,
-    U_TD_U_EXTRA, // Extra layer
-    U_TD_MAC, U_TD_WIN, // Mac Mode
-    U_TD_PST, // Paste Special
-    U_TD_PSCR, // Screenshot
+    U_TD_U_BASE,    // For extra alpha layer
+    U_TD_MAC,       // Mac Mode
+    U_TD_PST,       // Paste Special
+    U_TD_PSCR,      // Screenshot
 };
 
 // Tap dance helper functions
@@ -87,7 +88,7 @@ void u_td_fn_U_FUN(tap_dance_state_t *state, void *user_data) {
 }
 
 // Tap dance helper functions: Base / Extra Layer
-void u_td_fn_U_EXTRA(tap_dance_state_t *state, void *user_data) {
+void u_td_fn_U_BASE(tap_dance_state_t *state, void *user_data) {
     if (state->count == 1) {
         default_layer_set((layer_state_t)1 << U_BASE); // Base layer on single tap
     } else if (state->count == 2) {
@@ -96,20 +97,21 @@ void u_td_fn_U_EXTRA(tap_dance_state_t *state, void *user_data) {
 }
 
 // Tap dance helper functions: Mac Mode
-void u_td_mac_fn(tap_dance_state_t *state, void *user_data) { // Turn on Mac Mode
-  if (state->count == 2) {
-    isMac = true;
-    keymap_config.swap_lctl_lgui = true; // Swap Left Control and GUI
-    keymap_config.swap_rctl_rgui = true; // Swap Right Control and GUI
-  }
-}
-
-void u_td_win_fn(tap_dance_state_t *state, void *user_data) { // Turn off Mac Mode
-  if (state->count == 2) {
-    isMac = false;
-    keymap_config.swap_lctl_lgui = false;
-    keymap_config.swap_rctl_rgui = false;
-  }
+void u_td_mac_fn(tap_dance_state_t *state, void *user_data) { // 1:Mac, 2:Win
+    switch (state->count) { // Use state->count to determine tap count
+        case 1:
+            isMac = true; // Turn on Mac Mode
+            keymap_config.swap_lctl_lgui = true; // Swap Left Control and Left GUI
+            keymap_config.swap_rctl_rgui = true; // Swap Right Control and Right GUI
+            break;
+        case 2:
+            isMac = false; // Turn off Mac Mode
+            keymap_config.swap_lctl_lgui = false;
+            keymap_config.swap_rctl_rgui = false;
+            break;
+        default:
+            break; // Do nothing for unexpected tap counts
+    }
 }
 
 // Tap dance helper functions: Paste Special tap dance action
@@ -173,27 +175,17 @@ void u_td_pscr_fn(tap_dance_state_t *state, void *user_data) {
 
 // TAP DANCE ACTIONS ARRAY
 tap_dance_action_t tap_dance_actions[] = {
-
-    // Layer Locks
-    [U_TD_U_NAV]    = ACTION_TAP_DANCE_FN(u_td_fn_U_NAV),
+    [U_TD_U_NAV]    = ACTION_TAP_DANCE_FN(u_td_fn_U_NAV),   // Layer Locks
     [U_TD_U_MOUSE]  = ACTION_TAP_DANCE_FN(u_td_fn_U_MOUSE),
     [U_TD_U_SYS]    = ACTION_TAP_DANCE_FN(u_td_fn_U_SYS),
     [U_TD_U_NUM]    = ACTION_TAP_DANCE_FN(u_td_fn_U_NUM),
     [U_TD_U_SYM]    = ACTION_TAP_DANCE_FN(u_td_fn_U_SYM),
     [U_TD_U_FUN]    = ACTION_TAP_DANCE_FN(u_td_fn_U_FUN),
 
-    // Extra Alphas
-    [U_TD_U_EXTRA]  = ACTION_TAP_DANCE_FN(u_td_fn_U_EXTRA),
-    
-    // Mac Mode
-    [U_TD_MAC]      = ACTION_TAP_DANCE_FN(u_td_mac_fn),
-    [U_TD_WIN]      = ACTION_TAP_DANCE_FN(u_td_win_fn),
-
-    // Paste Special
-    [U_TD_PST]      = ACTION_TAP_DANCE_FN(u_td_pst_sp_fn),
-
-    // Screenshot
-    [U_TD_PSCR]     = ACTION_TAP_DANCE_FN(u_td_pscr_fn),
+    [U_TD_U_BASE]   = ACTION_TAP_DANCE_FN(u_td_fn_U_BASE),  // Extra Alphas
+    [U_TD_MAC]      = ACTION_TAP_DANCE_FN(u_td_mac_fn),     // Mac Mode
+    [U_TD_PST]      = ACTION_TAP_DANCE_FN(u_td_pst_sp_fn),  // Paste Special
+    [U_TD_PSCR]     = ACTION_TAP_DANCE_FN(u_td_pscr_fn),    // Screenshot
 };
 
 // Define U_PST as paste special tap dance to work across all keymaps.
@@ -203,14 +195,15 @@ tap_dance_action_t tap_dance_actions[] = {
 // ***CUSTOM KEYCODES***
 // Custom keycode declarations
 enum custom_keycodes {
-    U_TABB = SAFE_RANGE, U_TABF, // Tab navigation
-    U_BRWSR_BCK, U_BRWSR_FWD, // Browser navigation
+    U_TABB = SAFE_RANGE, U_TABF,    // Tab navigation
+    U_BRWSR_BCK, U_BRWSR_FWD,       // Browser navigation
     U_WH_L, U_WH_D, U_WH_U, U_WH_R, // Mouse scrolling
-    U_SEARCH, // "Spotlight" search
-    U_MDASH, // Em Dash
-    U_XWIN, U_XFRZ, // Excel Shortcuts: New Window, Freeze Panes
-    U_XIND, U_XOUT, // Excel Shortcuts: Indent, Outdent
-    U_XDECINC, U_XDECDEC, // Excel Shortcuts: Increase / Decrease Decimal
+    U_SEARCH,                       // "Spotlight" search
+    U_MDASH,                        // Em Dash
+    U_XWIN, U_XFRZ,                 // Excel Shortcuts: New Window, Freeze Panes
+    U_XIND, U_XOUT,                 // Excel Shortcuts: Indent, Outdent
+    U_XDECINC, U_XDECDEC,           // Excel Shortcuts: Increase / Decrease Decimal
+    U_NPON,                         // Activates Num Pad and turns on Num Lock
 };
 
 // Custom keycode handling
@@ -245,7 +238,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
                 unregister_code(KC_LCTL);
             }
-            return false;
+            return false; // Skip all further processing of this key
 
         // Browser navigation with U_BRWSR_BCK and U_BRWSR_FWD
         case U_BRWSR_BCK:
@@ -365,19 +358,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
+        // Activate Num Pad and Num Lock
+        case U_NPON:
+            if (record->event.pressed) {
+                if (!host_keyboard_led_state().num_lock) {
+                    tap_code(KC_NUM_LOCK); // Tap NumLock if NumLock is OFF
+                }
+                layer_on(U_NUMPAD);
+            }
+            return false; // Skip all further processing of this key
+
         default:
             return true;
     }
 }
-
 
 // Permissive Hold only for home-row shift and layer tap-holds
 bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case LSFT_T(KC_T): // Base Colemak-DH home-row left shift
         case RSFT_T(KC_N): // Base Colemak-DH home-row right shift
-        case LSFT_T(KC_F): // Extra QWERTY home-row left shift
-        case RSFT_T(KC_J): // Extra QWERTY home-row right shift
         case LT(U_BUTTON,KC_Z): // Layer tap-holds for Base and Extra
         case LT(U_BUTTON,KC_SLSH):
         case LT(U_SYS,KC_ESC):
@@ -397,92 +397,93 @@ bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
 // Caps Word modifications
 bool caps_word_press_user(uint16_t keycode) {
     switch (keycode) {
-        // Keycodes that continue Caps Word, with shift applied.
-        case KC_A ... KC_Z:
-            add_weak_mods(MOD_BIT(KC_LSFT));  // Apply shift to next key.
-            return true;
-
-        // Keycodes that continue Caps Word, without shifting.
-        case KC_1 ... KC_0:
-        case KC_BSPC:
-        case KC_DEL:
-        case KC_UNDS:
-        case KC_MINS:
-        case KC_DOT:
-            return true;
-
+        // Deactivate Caps Word only when the following keys are pressed
+        case KC_ENTER:
+        case KC_ESCAPE:
+        case KC_TAB:
+        case KC_SPACE:
+            return false;
+        // All other keys continue Caps Word
         default:
-            return false;  // Deactivate Caps Word.
+            // Apply shift to alphabetic keys
+            if (KC_A <= keycode && keycode <= KC_Z) {
+                add_weak_mods(MOD_BIT(KC_LSFT));
+            }
+            return true;
     }
 }
 
 // ***KEYMAP DEFINITIONS***
-
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
-
   [U_BASE] = LAYOUT( // Colemak-DH
-    RGUI_T(KC_Q),       ALGR_T(KC_W),   RCTL_T(KC_F),     RSFT_T(KC_P),     KC_B,                                                   KC_J,               LSFT_T(KC_L),     LCTL_T(KC_U),     ALGR_T(KC_Y),   LGUI_T(KC_QUOT),
-    LGUI_T(KC_A),       LALT_T(KC_R),   LCTL_T(KC_S),     LSFT_T(KC_T),     KC_G,                                                   KC_M,               RSFT_T(KC_N),     RCTL_T(KC_E),     LALT_T(KC_I),   RGUI_T(KC_O),
-    LT(U_BUTTON,KC_Z),  KC_X,           KC_C,             KC_D,             KC_V,             KC_NO,              KC_NO,            KC_K,               KC_H,             KC_COMM,          KC_DOT,         LT(U_BUTTON,KC_SLSH),
-    KC_NO,              KC_NO,          KC_NO,            LT(U_SYS,KC_ESC), LT(U_NAV,KC_SPC), LT(U_MOUSE,KC_TAB), LT(U_SYM,KC_ENT), LT(U_NUM,KC_BSPC),  LT(U_FUN,KC_DEL), KC_NO,            KC_NO,          KC_NO
+    RGUI_T(KC_Q),       ALGR_T(KC_W),   RCTL_T(KC_F),       RSFT_T(KC_P),       KC_B,                                                       KC_J,               LSFT_T(KC_L),       LCTL_T(KC_U),   ALGR_T(KC_Y),   LGUI_T(KC_QUOT),
+    LGUI_T(KC_A),       LALT_T(KC_R),   LCTL_T(KC_S),       LSFT_T(KC_T),       KC_G,                                                       KC_M,               RSFT_T(KC_N),       RCTL_T(KC_E),   LALT_T(KC_I),   RGUI_T(KC_O),
+    LT(U_BUTTON,KC_Z),  KC_X,           KC_C,               KC_D,               KC_V,               KC_NO,              KC_NO,              KC_K,               KC_H,               KC_COMM,        KC_DOT,         LT(U_BUTTON,KC_SLSH),
+    KC_NO,              KC_NO,          KC_NO,              LT(U_SYS,KC_ESC),   LT(U_NAV,KC_SPC),   LT(U_MOUSE,KC_TAB), LT(U_SYM,KC_ENT),   LT(U_NUM,KC_BSPC),  LT(U_FUN,KC_DEL),   KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_EXTRA] = LAYOUT( // QWERTY
-    RGUI_T(KC_Q),       ALGR_T(KC_W),   RCTL_T(KC_E),     RSFT_T(KC_R),     KC_T,                                                   KC_Y,               LSFT_T(KC_U),     LCTL_T(KC_I),     ALGR_T(KC_O),   LGUI_T(KC_P),
-    LGUI_T(KC_A),       LALT_T(KC_S),   LCTL_T(KC_D),     LSFT_T(KC_F),     KC_G,                                                   KC_H,               RSFT_T(KC_J),     RCTL_T(KC_K),     LALT_T(KC_L),   RGUI_T(KC_QUOT),
-    LT(U_BUTTON,KC_Z),  KC_X,           KC_C,             KC_V,             KC_B,             KC_NO,              KC_NO,            KC_N,               KC_M,             KC_COMM,          KC_DOT,         LT(U_BUTTON,KC_SLSH),
-    KC_NO,              KC_NO,          KC_NO,            LT(U_SYS,KC_ESC), LT(U_NAV,KC_SPC), LT(U_MOUSE,KC_TAB), LT(U_SYM,KC_ENT), LT(U_NUM,KC_BSPC),  LT(U_FUN,KC_DEL), KC_NO,            KC_NO,          KC_NO
+    KC_Q,               KC_W,           KC_E,               KC_R,               KC_T,                                                       KC_Y,               KC_U,               KC_I,           KC_O,           KC_P,
+    KC_A,               KC_S,           KC_D,               KC_F,               KC_G,                                                       KC_H,               KC_J,               KC_K,           KC_L,           KC_QUOT,
+    KC_Z,               KC_X,           KC_C,               KC_V,               KC_B,               KC_NO,              KC_NO,              KC_N,               KC_M,               KC_COMM,        KC_DOT,         KC_SLSH,
+    KC_NO,              KC_NO,          KC_NO,              LT(U_SYS,KC_ESC),   LT(U_NAV,KC_SPC),   LT(U_MOUSE,KC_TAB), LT(U_SYM,KC_ENT),   LT(U_NUM,KC_BSPC),  LT(U_FUN,KC_DEL),   KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_BUTTON] = LAYOUT(
-    U_UND,              U_CUT,          U_CPY,            U_PST,            U_RDO,                                                  U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
-    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,          U_UND,                                                  U_UND,              KC_LSFT,          KC_LCTL,          KC_LALT,        KC_LGUI,
-    U_UND,              U_CUT,          U_CPY,            U_PST,            U_RDO,            KC_NO,              KC_NO,            U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
-    KC_NO,              KC_NO,          KC_NO,            KC_BTN3,          KC_BTN1,          KC_BTN2,            KC_BTN2,          KC_BTN1,            KC_BTN3,          KC_NO,            KC_NO,          KC_NO
+    U_UND,              U_CUT,          U_CPY,              U_PST,              U_RDO,                                                      U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND,
+    KC_LGUI,            KC_LALT,        KC_LCTL,            KC_LSFT,            U_UND,                                                      U_UND,              KC_LSFT,            KC_LCTL,        KC_LALT,        KC_LGUI,
+    U_UND,              U_CUT,          U_CPY,              U_PST,              U_RDO,              KC_NO,              KC_NO,              U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND,
+    KC_NO,              KC_NO,          KC_NO,              KC_BTN3,            KC_BTN1,            KC_BTN2,            KC_BTN2,            KC_BTN1,            KC_BTN3,            KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_NAV] = LAYOUT(
-    KC_RGUI,            KC_ALGR,        KC_RCTL,          KC_RSFT,          KC_NO,                                                  U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
-    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,          KC_NO,                                                  CW_TOGG,            KC_LEFT,          KC_DOWN,          KC_UP,          KC_RGHT,
-    KC_NO,              KC_NO,          TD(U_TD_U_NAV),   TD(U_TD_U_EXTRA), KC_NO,            KC_NO,              KC_NO,            KC_INS,             KC_HOME,          KC_PGDN,          KC_PGUP,        KC_END,
-    KC_NO,              KC_NO,          KC_NO,            KC_NO,            KC_NO,            KC_NO,              KC_ENT,           KC_BSPC,            KC_DEL,           KC_NO,            KC_NO,          KC_NO
+    OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      KC_NO,                                                      U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND,
+    OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      KC_NO,                                                      CW_TOGG,            KC_LEFT,            KC_DOWN,        KC_UP,          KC_RGHT,
+    KC_NUM_LOCK,        U_NPON,         TD(U_TD_U_NAV),     TD(U_TD_U_BASE),    KC_NO,              KC_NO,              KC_NO,              KC_INS,             KC_HOME,            KC_PGDN,        KC_PGUP,        KC_END,
+    KC_NO,              KC_NO,          KC_NO,              KC_NO,              KC_NO,              KC_NO,              KC_ENT,             KC_BSPC,            KC_DEL,             KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_MOUSE] = LAYOUT(
-    KC_RGUI,            KC_ALGR,        KC_RCTL,          KC_RSFT,          KC_ACL2,                                                U_RDO,              U_PST,            U_CPY,            U_CUT,          U_UND,
-    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,          KC_ACL1,                                                KC_CAPS,            KC_MS_L,          KC_MS_D,          KC_MS_U,        KC_MS_R,
-    KC_NO,              KC_NO,          TD(U_TD_U_MOUSE), TD(U_TD_U_EXTRA), KC_ACL0,          KC_NO,              KC_NO,            KC_NO,              U_WH_L,           U_WH_D,           U_WH_U,         U_WH_R,
-    KC_NO,              KC_NO,          KC_NO,            KC_NO,            KC_NO,            KC_NO,              KC_BTN2,          KC_BTN1,            KC_BTN3,          KC_NO,            KC_NO,          KC_NO
+    OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      KC_ACL2,                                                    U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND,
+    OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      KC_ACL1,                                                    KC_CAPS,            KC_MS_L,            KC_MS_D,        KC_MS_U,        KC_MS_R,
+    KC_NO,              KC_NO,          TD(U_TD_U_MOUSE),   TD(U_TD_U_BASE),    KC_ACL0,            KC_NO,              KC_NO,              KC_NO,              U_WH_L,             U_WH_D,         U_WH_U,         U_WH_R,
+    KC_NO,              KC_NO,          KC_NO,              KC_NO,              KC_NO,              KC_NO,              KC_BTN2,            KC_BTN1,            KC_BTN3,            KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_SYS] = LAYOUT(
-    KC_RGUI,            KC_ALGR,        KC_RCTL,          KC_RSFT,          KC_NO,                                                  U_XWIN,             U_BRWSR_BCK,      U_TABB,           U_TABF,         U_BRWSR_FWD,
-    KC_LGUI,            KC_LALT,        KC_LCTL,          KC_LSFT,          KC_NO,                                                  U_SEARCH,           KC_MPRV,          KC_VOLD,          KC_VOLU,        KC_MNXT,
-    TD(U_TD_WIN),       KC_NO,          TD(U_TD_U_SYS),   TD(U_TD_U_EXTRA), TD(U_TD_MAC),     KC_NO,              KC_NO,            U_XFRZ,             U_XOUT,           U_XDECDEC,        U_XDECINC,      U_XIND,
-    KC_NO,              KC_NO,          KC_NO,            KC_NO,            KC_NO,            KC_NO,              KC_MSTP,          KC_MPLY,            KC_MUTE,          KC_NO,            KC_NO,          KC_NO
+    OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      TD(U_TD_PSCR),                                              U_XWIN,             U_BRWSR_BCK,        U_TABB,         U_TABF,         U_BRWSR_FWD,
+    OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      KC_SCRL,                                                    U_SEARCH,           KC_MPRV,            KC_VOLD,        KC_VOLU,        KC_MNXT,
+    QK_BOOT,            TD(U_TD_MAC),   TD(U_TD_U_SYS),     TD(U_TD_U_BASE),    KC_PAUS,            KC_NO,              KC_NO,              U_XFRZ,             U_XOUT,             U_XDECDEC,      U_XDECINC,      U_XIND,
+    KC_NO,              KC_NO,          KC_NO,              KC_NO,              KC_NO,              KC_NO,              KC_MSTP,            KC_MPLY,            KC_MUTE,            KC_NO,          KC_NO,          KC_NO
 
   ),
 
   [U_NUM] = LAYOUT(
-    KC_LBRC,            KC_7,           KC_8,             KC_9,             KC_RBRC,                                                KC_NO,              KC_LSFT,          KC_LCTL,          KC_ALGR,        KC_LGUI,
-    KC_SCLN,            KC_4,           KC_5,             KC_6,             KC_EQL,                                                 KC_SPC,             KC_RSFT,          KC_RCTL,          KC_LALT,        KC_RGUI,
-    KC_GRV,             KC_1,           KC_2,             KC_3,             KC_BSLS,          KC_NO,              KC_NO,            KC_NO,              TD(U_TD_U_EXTRA), TD(U_TD_U_NUM),   KC_DOT,         KC_SLSH,
-    KC_NO,              KC_NO,          KC_NO,            KC_DOT,           KC_0,             KC_MINS,            KC_NO,            KC_NO,              KC_NO,            KC_NO,            KC_NO,          KC_NO
+    KC_LBRC,            KC_7,           KC_8,               KC_9,               KC_RBRC,                                                    KC_NO,              OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
+    KC_SCLN,            KC_4,           KC_5,               KC_6,               KC_EQL,                                                     KC_SPC,             OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
+    KC_GRV,             KC_1,           KC_2,               KC_3,               KC_BSLS,            KC_NO,              KC_NO,              KC_NO,              TD(U_TD_U_BASE),    TD(U_TD_U_NUM), KC_DOT,         KC_SLSH,
+    KC_NO,              KC_NO,          KC_NO,              KC_DOT,             KC_0,               KC_MINS,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_SYM] = LAYOUT(
-    KC_LCBR,            KC_AMPR,        KC_ASTR,          KC_LPRN,          KC_RCBR,                                                KC_NO,              KC_LSFT,          KC_LCTL,          KC_ALGR,        KC_LGUI,
-    KC_COLN,            KC_DLR,         KC_PERC,          KC_CIRC,          KC_PLUS,                                                KC_SPC,             KC_RSFT,          KC_RCTL,          KC_LALT,        KC_RGUI,
-    KC_TILD,            KC_EXLM,        KC_AT,            KC_HASH,          KC_PIPE,          KC_NO,              KC_NO,            KC_NO,              TD(U_TD_U_EXTRA), TD(U_TD_U_SYM),   KC_DOT,         KC_SLSH,
-    KC_NO,              KC_NO,          KC_NO,            KC_LPRN,          KC_RPRN,          U_MDASH,            KC_NO,            KC_NO,              KC_NO,            KC_NO,            KC_NO,          KC_NO
+    KC_LCBR,            KC_AMPR,        KC_ASTR,            KC_LPRN,            KC_RCBR,                                                    KC_NO,              OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
+    KC_COLN,            KC_DLR,         KC_PERC,            KC_CIRC,            KC_PLUS,                                                    KC_SPC,             OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
+    KC_TILD,            KC_EXLM,        KC_AT,              KC_HASH,            KC_PIPE,            KC_NO,              KC_NO,              KC_NO,              TD(U_TD_U_BASE),    TD(U_TD_U_SYM), KC_DOT,         KC_SLSH,
+    KC_NO,              KC_NO,          KC_NO,              KC_LPRN,            KC_RPRN,            U_MDASH,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_FUN] = LAYOUT(
-    KC_F12,             KC_F7,          KC_F8,            KC_F9,            TD(U_TD_PSCR),                                          KC_NO,              KC_LSFT,          KC_LCTL,          KC_ALGR,        KC_LGUI,
-    KC_F11,             KC_F4,          KC_F5,            KC_F6,            KC_SCRL,                                                KC_NO,              KC_RSFT,          KC_RCTL,          KC_LALT,        KC_RGUI,
-    KC_F10,             KC_F1,          KC_F2,            KC_F3,            KC_PAUS,          KC_NO,              KC_NO,            KC_NO,              TD(U_TD_U_EXTRA), TD(U_TD_U_FUN),   KC_NO,          KC_NO,
-    KC_NO,              KC_NO,          KC_NO,            KC_APP,           KC_SPC,           KC_TAB,             KC_NO,            KC_NO,              KC_NO,            KC_NO,            KC_NO,          KC_NO
+    KC_F12,             KC_F7,          KC_F8,              KC_F9,              KC_F15,                                                     TD(U_TD_PSCR),      OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
+    KC_F11,             KC_F4,          KC_F5,              KC_F6,              KC_F14,                                                     KC_SCRL,            OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
+    KC_F10,             KC_F1,          KC_F2,              KC_F3,              KC_F13,             KC_NO,              KC_NO,              KC_PAUS,            TD(U_TD_U_BASE),    TD(U_TD_U_FUN), TD(U_TD_MAC),   QK_BOOT,
+    KC_NO,              KC_NO,          KC_NO,              KC_APP,             KC_SPC,             KC_TAB,             KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
   ),
 
+  [U_NUMPAD] = LAYOUT(
+    OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),    KC_NO,                                                        KC_PAST,            KC_P7,              KC_P8,          KC_P9,          KC_PMNS,
+    OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),    KC_BSPC,                                                      KC_PEQL,            KC_P4,              KC_P5,          KC_P6,          KC_PPLS,
+    KC_NUM_LOCK,        TG(U_NUMPAD),   KC_NO,              TG(U_NUMPAD),     KC_NO,                KC_NO,              KC_NO,              KC_PSLS,            KC_P1,              KC_P2,          KC_P3,          KC_PENT,
+    KC_NO,              KC_NO,          KC_NO,              KC_ESC,            KC_SPC,              KC_TAB,             KC_PCMM,            KC_P0,              KC_PDOT,            KC_NO,          KC_NO,          KC_NO
+  ),
 };
