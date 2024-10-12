@@ -1,6 +1,6 @@
 [
   {
-    "css": ".shift-symbol {\n    font-style: normal;\n}\n\n.shift-symbol::after {\n    content: \"\\21E7\";\n    font-family: Arial, sans-serif;\n}\n"
+    "css": ".shift-symbol::after {\n    content: \"\\21E7\";\n    font-family: Arial, sans-serif;\n    font-style: normal;\n}\n"
   },
   [
     {
