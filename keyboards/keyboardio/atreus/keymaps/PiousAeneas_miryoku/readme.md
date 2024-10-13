@@ -18,15 +18,15 @@ Base Layer alphas are [Colemak Mod-DH](https://colemakmods.github.io/mod-dh/).  
 
 **Number Layer**: The primary left-hand layer activated by holding the right home thumb key is for numerals and symbols. Numerals are in the standard numpad locations with symbols in the remaining positions. `Dot` is duplicated from the base layer. **Auto Shift** is enabled for numbers and symbols, simply hold the key to get its shifted state. Same-hand `Space`, `Dot`, and `Backslash` are duplicated from the Base Layer to minimize layer changes.
 
-One-shot mods for both hands mirrored from the Base Layer are available on the same hand as the layer change thumb key. Same-hand bottom-row index column used to toggle between Base Layer on single tap and Extra Layer on double tap. Same-hand bottom-row middle column is for **Layer Lock**: tap once to lock current layer, tap twice to lock the opposite hand's layer.
+**For all primary, secondary, and tertiary layers**: One-shot mods for both hands mirrored from the Base Layer are available on the same hand as the layer change thumb key. Same-hand bottom-row index column key is used to toggle between Base Layer on single tap and Extra Layer on double tap. Same-hand bottom-row middle column is for **Layer Lock**: tap once to lock current layer, tap twice to lock the opposite hand's layer. Layer Lock works by setting the default layer that the keyboard returns to since standard layer toggles [can't be used](https://github.com/manna-harbour/miryoku/discussions/15) to lock the currently active momentary layer. Layer Lock can be unlocked by tapping the same-hand bottom-row index column, or by using the following combos on the active hand (i.e. right hand for Nav, Mouse, Sys; left hand for Num, Sym, Fun) which allows for full single-handed locking and unlocking:
+- To return to Base Layer:  Combo bottom-row inner column + index column keys.
+- To return to Extra Layer: Combo bottom-row inner column + index column + middle column keys.
 
 ### Secondary Layers: Mouse & Function
 
 **Mouse Layer**: Secondary right-hand layer is for mouse emulation. Mouse movement mirrors cursor navigation on home row, and scroll wheel mirrors line and page movement below. Mouse buttons are on the thumbs. Left, right, and middle mouse buttons are on the primary, secondary, and tertiary thumb keys, respectively. Mouse movement, click, and drag, with modifiers, can be performed from the home position. Clipboard keys are duplicated from the Nav Layer. Mac Mode reverses scroll directions for compatibility with Natural Scrolling on trackpad. Hold keys on same-hand inner column to temporarily modify mouse and scroll speed.
 
 **Symbol Layer**: Secondary left-hand layer has shifted symbols in the same locations as Num Layer to reduce chording when using mods with shifted symbols. `Open Parenthesis` is duplicated next to `Close Parenthesis` and `Em-Dash` replaces `Underscore`. Same-hand `Space`, `Dot`, and `Backslash` are duplicated from the Base Layer to minimize layer changes.
-
-One-shot mods for both hands mirrored from the Base Layer are available on the same hand as the layer change thumb key. Same-hand bottom-row index column used to toggle between Base Layer on single tap and Extra Layer on double tap. Same-hand bottom-row middle column is for **Layer Lock**: tap once to lock current layer, tap twice to lock the opposite hand's layer.
 
 ### Tertiary Layers: System & Function
 

@@ -2,6 +2,7 @@
 # https://github.com/manna-harbour/miryoku
 
 MOUSEKEY_ENABLE 	= yes
+COMBO_ENABLE		= yes # For layer lock return combos
 EXTRAKEY_ENABLE 	= yes # Audio control and System control
 AUTO_SHIFT_ENABLE	= yes
 TAP_DANCE_ENABLE 	= yes

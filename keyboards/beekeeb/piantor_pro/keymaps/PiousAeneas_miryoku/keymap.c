@@ -449,7 +449,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [U_MOUSE] = LAYOUT_split_3x6_3(
     KC_NO,  OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      KC_ACL2,                                                    U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND, KC_NO,
     KC_NO,  OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      KC_ACL1,                                                    KC_CAPS,            KC_MS_L,            KC_MS_D,        KC_MS_U,        KC_MS_R, KC_NO,
-    KC_NO,  KC_NO,              KC_NO,          TD(U_TD_U_MOUSE),   TD(U_TD_U_BASE),    KC_ACL0,                                                    KC_NO,              U_WH_L,             U_WH_D,         U_WH_U,         U_WH_R, KC_NO,
+    KC_NO,  KC_NO,              KC_NO,          TD(U_TD_U_MOUSE),   TD(U_TD_U_BASE),    KC_ACL0,                                                    KC_INS,             U_WH_L,             U_WH_D,         U_WH_U,         U_WH_R, KC_NO,
                                                                     KC_NO,              KC_NO,              KC_NO,              KC_BTN2,            KC_BTN1,            KC_BTN3
   ),
 
@@ -488,4 +488,51 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_NO,  KC_NUM_LOCK,        TG(U_NUMPAD),   KC_NO,              TG(U_NUMPAD),     KC_NO,                                                        KC_PSLS,            KC_P1,              KC_P2,          KC_P3,          KC_PENT, KC_NO,
                                                                     KC_ESC,            KC_SPC,              KC_TAB,             KC_PCMM,            KC_P0,              KC_PDOT
   ),
+};
+
+
+// ***LAYER LOCK RETURN COMBOS***
+// Combos for returning to Base or Extra Layer after a single-handed layer lock.
+enum combos {
+  NAV_TO_BASE,
+  MOUSE_TO_BASE,
+  SYS_TO_BASE,
+  NUM_TO_BASE,
+  SYM_TO_BASE,
+  FUN_TO_BASE,
+  NAV_TO_EXTRA,
+  MOUSE_TO_EXTRA,
+  SYS_TO_EXTRA,
+  NUM_TO_EXTRA,
+  SYM_TO_EXTRA,
+  FUN_TO_EXTRA
+};
+
+const uint16_t PROGMEM nav_base_combo[]     = {KC_INS,  KC_HOME,    COMBO_END};
+const uint16_t PROGMEM mouse_base_combo[]   = {KC_INS,  U_WH_L,     COMBO_END};
+const uint16_t PROGMEM sys_base_combo[]     = {U_XFRZ,  U_XOUT,     COMBO_END};
+const uint16_t PROGMEM num_base_combo[]     = {KC_3,    KC_BSLS,    COMBO_END};
+const uint16_t PROGMEM sym_base_combo[]     = {KC_HASH, KC_PIPE,    COMBO_END};
+const uint16_t PROGMEM fun_base_combo[]     = {KC_F3,   KC_F13,     COMBO_END};
+
+const uint16_t PROGMEM nav_extra_combo[]    = {KC_INS,  KC_HOME,    KC_PGDN,    COMBO_END};
+const uint16_t PROGMEM mouse_extra_combo[]  = {KC_INS,  U_WH_L,     U_WH_D,     COMBO_END};
+const uint16_t PROGMEM sys_extra_combo[]    = {U_XFRZ,  U_XOUT,     U_XDECDEC,  COMBO_END};
+const uint16_t PROGMEM num_extra_combo[]    = {KC_2,    KC_3,       KC_BSLS,    COMBO_END};
+const uint16_t PROGMEM sym_extra_combo[]    = {KC_AT,   KC_HASH,    KC_PIPE,    COMBO_END};
+const uint16_t PROGMEM fun_extra_combo[]    = {KC_F2,   KC_F3,      KC_F13,     COMBO_END};
+
+combo_t key_combos[]    = {
+  [NAV_TO_BASE]         = COMBO(nav_base_combo,     DF(U_BASE)),
+  [MOUSE_TO_BASE]       = COMBO(mouse_base_combo,   DF(U_BASE)),
+  [SYS_TO_BASE]         = COMBO(sys_base_combo,     DF(U_BASE)),
+  [NUM_TO_BASE]         = COMBO(num_base_combo,     DF(U_BASE)),
+  [SYM_TO_BASE]         = COMBO(sym_base_combo,     DF(U_BASE)),
+  [FUN_TO_BASE]         = COMBO(fun_base_combo,     DF(U_BASE)),
+  [NAV_TO_EXTRA]        = COMBO(nav_extra_combo,    DF(U_EXTRA)),
+  [MOUSE_TO_EXTRA]      = COMBO(mouse_extra_combo,  DF(U_EXTRA)),
+  [SYS_TO_EXTRA]        = COMBO(sys_extra_combo,    DF(U_EXTRA)),
+  [NUM_TO_EXTRA]        = COMBO(num_extra_combo,    DF(U_EXTRA)),
+  [SYM_TO_EXTRA]        = COMBO(sym_extra_combo,    DF(U_EXTRA)),
+  [FUN_TO_EXTRA]        = COMBO(fun_extra_combo,    DF(U_EXTRA)),
 };
