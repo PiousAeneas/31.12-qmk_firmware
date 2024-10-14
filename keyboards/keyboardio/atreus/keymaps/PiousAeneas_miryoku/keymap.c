@@ -24,7 +24,7 @@ enum miryoku_layers {
 #define U_UND C(KC_Z)
 #define U_RDO C(KC_Y)
 
-// Define boolean to track if Mac Mode is active
+// Define boolean to track if Mac Mode is active.
 bool isMac = false; 
 
 // ***TAP DANCE***
@@ -98,19 +98,19 @@ void u_td_fn_U_BASE(tap_dance_state_t *state, void *user_data) {
 
 // Tap dance helper functions: Mac Mode
 void u_td_mac_fn(tap_dance_state_t *state, void *user_data) { // 1:Mac, 2:Win
-    switch (state->count) { // Use state->count to determine tap count
+    switch (state->count) { // Use state->count to determine tap count.
         case 1:
-            isMac = true; // Turn on Mac Mode
-            keymap_config.swap_lctl_lgui = true; // Swap Left Control and Left GUI
-            keymap_config.swap_rctl_rgui = true; // Swap Right Control and Right GUI
+            isMac = true; // Turn on Mac Mode.
+            keymap_config.swap_lctl_lgui = true; // Swap Left Control and Left GUI.
+            keymap_config.swap_rctl_rgui = true; // Swap Right Control and Right GUI.
             break;
         case 2:
-            isMac = false; // Turn off Mac Mode
+            isMac = false; // Turn off Mac Mode.
             keymap_config.swap_lctl_lgui = false;
             keymap_config.swap_rctl_rgui = false;
             break;
         default:
-            break; // Do nothing for unexpected tap counts
+            break; // Do nothing for unexpected tap counts.
     }
 }
 
@@ -118,11 +118,11 @@ void u_td_mac_fn(tap_dance_state_t *state, void *user_data) { // 1:Mac, 2:Win
 void u_td_pst_sp_fn(tap_dance_state_t *state, void *user_data) { // 1:Paste, 2:Paste Special
     if (isMac) { 
         register_code(KC_LCMD); 
-        if (state->count == 2) { // Paste Special requires additional modifiers
+        if (state->count == 2) { // Paste Special requires additional modifiers.
             register_code(KC_LSFT);
             register_code(KC_LALT);
         }
-        tap_code(KC_V); // Press and release V key
+        tap_code(KC_V); // Press and release V key.
         unregister_code(KC_LCMD);
         if (state->count == 2) {
             unregister_code(KC_LALT);
@@ -130,7 +130,7 @@ void u_td_pst_sp_fn(tap_dance_state_t *state, void *user_data) { // 1:Paste, 2:P
         }
     } else { // Windows shortcuts
         register_code(KC_LCTL);
-        if (state->count == 2) { // Paste Special in Windows
+        if (state->count == 2) { // Paste Special in Windows.
             register_code(KC_LSFT); 
         }
         tap_code(KC_V);
@@ -210,7 +210,7 @@ enum custom_keycodes {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
             
-        // Perform redo action for Mac (Cmd+Shift+Z)
+        // Perform redo action for Mac (Cmd+Shift+Z).
         case U_RDO:
             if (record->event.pressed) {
                 if (isMac) {
@@ -222,7 +222,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     return false;
                 }
             }
-            return true; // Else use default redo (Windows)
+            return true; // Else use default redo (Windows).
         
         // Tab navigation with U_TABB and U_TABF
         case U_TABB:
@@ -230,26 +230,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 register_code(KC_LCTL);
                 if (keycode == U_TABB) {
-                    register_code(KC_LSFT); // If U_TABB, press and hold Left Shift
+                    register_code(KC_LSFT); // If U_TABB, press and hold Left Shift.
                 }
-                tap_code(KC_TAB); // Tap Tab
+                tap_code(KC_TAB); // Tap Tab.
                 if (keycode == U_TABB) {
                     unregister_code(KC_LSFT);
                 }
                 unregister_code(KC_LCTL);
             }
-            return false; // Skip all further processing of this key
+            return false; // Skip all further processing of this key.
 
         // Browser navigation with U_BRWSR_BCK and U_BRWSR_FWD
         case U_BRWSR_BCK:
         case U_BRWSR_FWD:
             if (record->event.pressed) {
                 if (isMac) {
-                    register_code(KC_LGUI); // Press and hold Left GUI
-                    tap_code(keycode == U_BRWSR_BCK ? KC_LBRC : KC_RBRC); // Tap [ for U_BRWSR_BCK or ] for U_BRWSR_FWD
+                    register_code(KC_LGUI); // Press and hold Left GUI.
+                    tap_code(keycode == U_BRWSR_BCK ? KC_LBRC : KC_RBRC); // Tap [ for U_BRWSR_BCK or ] for U_BRWSR_FWD.
                     unregister_code(KC_LGUI); // Release Left GUI
                 } else {
-                    tap_code(keycode == U_BRWSR_BCK ? KC_WBAK : KC_WFWD); // Tap Browser Back for U_BRWSR_BCK or Browser Forward for U_BRWSR_FWD
+                    tap_code(keycode == U_BRWSR_BCK ? KC_WBAK : KC_WFWD); // Tap Browser Back for U_BRWSR_BCK or Browser Forward for U_BRWSR_FWD.
                 }
             }
             return false;
@@ -288,13 +288,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case U_SEARCH:
             if (record->event.pressed) {
                 if (isMac) {
-                    register_code(KC_LCMD); // Press and hold Left Command
-                    tap_code(KC_SPC); // Tap Space
-                    unregister_code(KC_LCMD); // Release Left Command
+                    register_code(KC_LCMD);     // Press and hold Left Command.
+                    tap_code(KC_SPC);           // Tap Space.
+                    unregister_code(KC_LCMD);   // Release Left Command.
                 } else {
-                    register_code(KC_LGUI); // Press and hold Left GUI (Windows key)
-                    tap_code(KC_S); // Tap S
-                    unregister_code(KC_LGUI); // Release Left GUI
+                    register_code(KC_LGUI);     // Press and hold Left GUI (Windows key).
+                    tap_code(KC_S);             // Tap S.
+                    unregister_code(KC_LGUI);   // Release Left GUI.
                 }
             }
             return false;
@@ -302,13 +302,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         // Em Dash
         case U_MDASH:
             if (record->event.pressed) {
-                if (isMac) { /// Mac em dash
+                if (isMac) {                    // Mac em dash
                     register_code(KC_LALT);
                     register_code(KC_LSFT);
                     tap_code(KC_MINS);
                     unregister_code(KC_LSFT);
                     unregister_code(KC_LALT);
-                } else { /// Win em dash
+                } else {                        // Win em dash
                     register_code(KC_LALT);
                     tap_code(KC_KP_0);
                     tap_code(KC_KP_1);
@@ -362,17 +362,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case U_NPON:
             if (record->event.pressed) {
                 if (!host_keyboard_led_state().num_lock) {
-                    tap_code(KC_NUM_LOCK); // Tap NumLock if NumLock is OFF
+                    tap_code(KC_NUM_LOCK); // Tap NumLock if NumLock is OFF.
                 }
                 layer_on(U_NUMPAD);
             }
-            return false; // Skip all further processing of this key
+            return false; // Skip all further processing of this key.
 
         default:
             return true;
     }
 }
 
+// ***FEATURE MODIFICATIONS***
 // Permissive Hold only for home-row shift and layer tap-holds
 bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
@@ -397,21 +398,78 @@ bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
 // Caps Word modifications
 bool caps_word_press_user(uint16_t keycode) {
     switch (keycode) {
-        // Deactivate Caps Word only when the following keys are pressed
+        // Deactivate Caps Word only when the following keys are pressed.
         case KC_ENTER:
         case KC_ESCAPE:
         case KC_TAB:
         case KC_SPACE:
             return false;
-        // All other keys continue Caps Word
+        // All other keys continue Caps Word.
         default:
-            // Apply shift to alphabetic keys
+            // Apply shift to alphabetic keys.
             if (KC_A <= keycode && keycode <= KC_Z) {
                 add_weak_mods(MOD_BIT(KC_LSFT));
             }
             return true;
     }
 }
+
+// Tapping Term per Key modifications
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case LGUI_T(KC_A): // Left home-row pinky
+        case RGUI_T(KC_O): // Right home-row pinky
+            return TAPPING_TERM + 50; // Add 50ms to pinky tapping term.
+        default:
+            return TAPPING_TERM;
+    }
+}
+
+// ***LAYER LOCK RETURN COMBOS***
+// Combos for returning to Base or Extra Layer after a single-handed layer lock.
+enum combos {
+  NAV_TO_BASE,
+  MOUSE_TO_BASE,
+  SYS_TO_BASE,
+  NUM_TO_BASE,
+  SYM_TO_BASE,
+  FUN_TO_BASE,
+  NAV_TO_EXTRA,
+  MOUSE_TO_EXTRA,
+  SYS_TO_EXTRA,
+  NUM_TO_EXTRA,
+  SYM_TO_EXTRA,
+  FUN_TO_EXTRA
+};
+
+const uint16_t PROGMEM nav_base_combo[]     = {KC_INS,  KC_HOME,    COMBO_END};
+const uint16_t PROGMEM mouse_base_combo[]   = {KC_INS,  U_WH_L,     COMBO_END};
+const uint16_t PROGMEM sys_base_combo[]     = {U_XFRZ,  U_XOUT,     COMBO_END};
+const uint16_t PROGMEM num_base_combo[]     = {KC_3,    KC_BSLS,    COMBO_END};
+const uint16_t PROGMEM sym_base_combo[]     = {KC_HASH, KC_PIPE,    COMBO_END};
+const uint16_t PROGMEM fun_base_combo[]     = {KC_F3,   KC_F13,     COMBO_END};
+
+const uint16_t PROGMEM nav_extra_combo[]    = {KC_INS,  KC_HOME,    KC_PGDN,    COMBO_END};
+const uint16_t PROGMEM mouse_extra_combo[]  = {KC_INS,  U_WH_L,     U_WH_D,     COMBO_END};
+const uint16_t PROGMEM sys_extra_combo[]    = {U_XFRZ,  U_XOUT,     U_XDECDEC,  COMBO_END};
+const uint16_t PROGMEM num_extra_combo[]    = {KC_2,    KC_3,       KC_BSLS,    COMBO_END};
+const uint16_t PROGMEM sym_extra_combo[]    = {KC_AT,   KC_HASH,    KC_PIPE,    COMBO_END};
+const uint16_t PROGMEM fun_extra_combo[]    = {KC_F2,   KC_F3,      KC_F13,     COMBO_END};
+
+combo_t key_combos[]    = {
+  [NAV_TO_BASE]         = COMBO(nav_base_combo,     DF(U_BASE)),
+  [MOUSE_TO_BASE]       = COMBO(mouse_base_combo,   DF(U_BASE)),
+  [SYS_TO_BASE]         = COMBO(sys_base_combo,     DF(U_BASE)),
+  [NUM_TO_BASE]         = COMBO(num_base_combo,     DF(U_BASE)),
+  [SYM_TO_BASE]         = COMBO(sym_base_combo,     DF(U_BASE)),
+  [FUN_TO_BASE]         = COMBO(fun_base_combo,     DF(U_BASE)),
+  [NAV_TO_EXTRA]        = COMBO(nav_extra_combo,    DF(U_EXTRA)),
+  [MOUSE_TO_EXTRA]      = COMBO(mouse_extra_combo,  DF(U_EXTRA)),
+  [SYS_TO_EXTRA]        = COMBO(sys_extra_combo,    DF(U_EXTRA)),
+  [NUM_TO_EXTRA]        = COMBO(num_extra_combo,    DF(U_EXTRA)),
+  [SYM_TO_EXTRA]        = COMBO(sym_extra_combo,    DF(U_EXTRA)),
+  [FUN_TO_EXTRA]        = COMBO(fun_extra_combo,    DF(U_EXTRA)),
+};
 
 // ***KEYMAP DEFINITIONS***
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -486,50 +544,4 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_NUM_LOCK,        TG(U_NUMPAD),   KC_NO,              TG(U_NUMPAD),     KC_NO,                KC_NO,              KC_NO,              KC_PSLS,            KC_P1,              KC_P2,          KC_P3,          KC_PENT,
     KC_NO,              KC_NO,          KC_NO,              KC_ESC,            KC_SPC,              KC_TAB,             KC_PCMM,            KC_P0,              KC_PDOT,            KC_NO,          KC_NO,          KC_NO
   ),
-};
-
-// ***LAYER LOCK RETURN COMBOS***
-// Combos for returning to Base or Extra Layer after a single-handed layer lock.
-enum combos {
-  NAV_TO_BASE,
-  MOUSE_TO_BASE,
-  SYS_TO_BASE,
-  NUM_TO_BASE,
-  SYM_TO_BASE,
-  FUN_TO_BASE,
-  NAV_TO_EXTRA,
-  MOUSE_TO_EXTRA,
-  SYS_TO_EXTRA,
-  NUM_TO_EXTRA,
-  SYM_TO_EXTRA,
-  FUN_TO_EXTRA
-};
-
-const uint16_t PROGMEM nav_base_combo[]     = {KC_INS,  KC_HOME,    COMBO_END};
-const uint16_t PROGMEM mouse_base_combo[]   = {KC_INS,  U_WH_L,     COMBO_END};
-const uint16_t PROGMEM sys_base_combo[]     = {U_XFRZ,  U_XOUT,     COMBO_END};
-const uint16_t PROGMEM num_base_combo[]     = {KC_3,    KC_BSLS,    COMBO_END};
-const uint16_t PROGMEM sym_base_combo[]     = {KC_HASH, KC_PIPE,    COMBO_END};
-const uint16_t PROGMEM fun_base_combo[]     = {KC_F3,   KC_F13,     COMBO_END};
-
-const uint16_t PROGMEM nav_extra_combo[]    = {KC_INS,  KC_HOME,    KC_PGDN,    COMBO_END};
-const uint16_t PROGMEM mouse_extra_combo[]  = {KC_INS,  U_WH_L,     U_WH_D,     COMBO_END};
-const uint16_t PROGMEM sys_extra_combo[]    = {U_XFRZ,  U_XOUT,     U_XDECDEC,  COMBO_END};
-const uint16_t PROGMEM num_extra_combo[]    = {KC_2,    KC_3,       KC_BSLS,    COMBO_END};
-const uint16_t PROGMEM sym_extra_combo[]    = {KC_AT,   KC_HASH,    KC_PIPE,    COMBO_END};
-const uint16_t PROGMEM fun_extra_combo[]    = {KC_F2,   KC_F3,      KC_F13,     COMBO_END};
-
-combo_t key_combos[]    = {
-  [NAV_TO_BASE]         = COMBO(nav_base_combo,     DF(U_BASE)),
-  [MOUSE_TO_BASE]       = COMBO(mouse_base_combo,   DF(U_BASE)),
-  [SYS_TO_BASE]         = COMBO(sys_base_combo,     DF(U_BASE)),
-  [NUM_TO_BASE]         = COMBO(num_base_combo,     DF(U_BASE)),
-  [SYM_TO_BASE]         = COMBO(sym_base_combo,     DF(U_BASE)),
-  [FUN_TO_BASE]         = COMBO(fun_base_combo,     DF(U_BASE)),
-  [NAV_TO_EXTRA]        = COMBO(nav_extra_combo,    DF(U_EXTRA)),
-  [MOUSE_TO_EXTRA]      = COMBO(mouse_extra_combo,  DF(U_EXTRA)),
-  [SYS_TO_EXTRA]        = COMBO(sys_extra_combo,    DF(U_EXTRA)),
-  [NUM_TO_EXTRA]        = COMBO(num_extra_combo,    DF(U_EXTRA)),
-  [SYM_TO_EXTRA]        = COMBO(sym_extra_combo,    DF(U_EXTRA)),
-  [FUN_TO_EXTRA]        = COMBO(fun_extra_combo,    DF(U_EXTRA)),
 };

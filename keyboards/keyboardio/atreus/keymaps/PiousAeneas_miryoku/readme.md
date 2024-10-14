@@ -10,7 +10,7 @@ A custom keyboard layout adapted heavily from Manna Harbour's [Miryoku](https://
 
 Base Layer alphas are [Colemak Mod-DH](https://colemakmods.github.io/mod-dh/).  `Comma`, `Dot`, and `Slash`, are included with the alphas, plus `Apostrophe` replacing `Semicolon`. Combine with `Shift` for `Less Than`, `Greater Than`, `Question Mark`, and `Quote`, as usual. The primary, secondary, and tertiary thumb keys are `Backspace`, `Enter`, and `Delete` on the right, and `Space`, `Tab`, and `Escape` on the left, respectively.
 
-**Home Row Mods**: Tap for alpha, hold for modifier indicated in the lower front legend. Opposite-hand modifiers available on the top row. **Permissive Hold** is enabled for home-row shifts and thumb key layer tap-holds (i.e. `Sys`, `Nav`, `Mouse`, `Sym`, `Num`, `Fun`, `Button`) meaning the keys will immediately select the hold action when another key is tapped.
+**Home Row Mods**: Tap for alpha, hold for modifier indicated in the lower front legend. Opposite-hand modifiers available on the top row. **Permissive Hold** is enabled for home-row shifts and thumb key layer tap-holds (i.e. `Sys`, `Nav`, `Mouse`, `Sym`, `Num`, `Fun`, `Button`) meaning the keys will immediately select the hold action when another key is tapped. Tapping term is extended by 50ms for pinky-key home row mods to prevent disruptive accidental triggering of e.g. `Win+R` and `Win+L`. 
 
 ### Primary Layers: Navigation & Number
 

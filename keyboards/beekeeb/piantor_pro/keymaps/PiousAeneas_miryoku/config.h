@@ -3,12 +3,13 @@
 
 #pragma once
 
-#define CAPS_WORD_INVERT_ON_SHIFT 	// Holding Shift continues Caps Word but inverts the shift state
-#define CAPS_WORD_IDLE_TIMEOUT 5000	// Reiterates default five second timeout
-#define PERMISSIVE_HOLD_PER_KEY 	// Selects the hold action when another key is pressed and then released even within the tapping term
-#define MK_COMBINED 				// Enables momentary keys to set mouse speed to different constants
+#define CAPS_WORD_INVERT_ON_SHIFT 	// Holding Shift continues Caps Word but inverts the shift state.
+#define CAPS_WORD_IDLE_TIMEOUT 5000	// Reiterates default five second timeout.
+#define PERMISSIVE_HOLD_PER_KEY 	// Selects the hold action when another key is pressed and then released even within the tapping term.
+#define MK_COMBINED 				// Enables momentary keys to set mouse speed to different constants.
 
 #define TAPPING_TERM 200 			// Reiterates default value.
+#define TAPPING_TERM_PER_KEY		// For lengthening pinky GUI home row mod.
 #define QUICK_TAP_TERM 0 			// Disables auto-repeat after quick tap for faster home row mods.
 
 // Auto Shift
