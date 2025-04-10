@@ -59,6 +59,8 @@
 #endif
 
 int8_t comboscroll_invert = 1; // for use with Mac mode scroll inversion
+uint16_t dragscroll_divisor_h = PLOOPY_DRAGSCROLL_DIVISOR_H; // for realtime scroll speed adjustments
+uint16_t dragscroll_divisor_v = PLOOPY_DRAGSCROLL_DIVISOR_V; // for realtime scroll speed adjustments
 
 keyboard_config_t keyboard_config;
 uint16_t          dpi_array[] = PLOOPY_DPI_OPTIONS;
@@ -142,8 +144,8 @@ void cycle_dpi(void) {
 
 report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
     if (is_drag_scroll) {
-        scroll_accumulated_h += (float)mouse_report.x / PLOOPY_DRAGSCROLL_DIVISOR_H;
-        scroll_accumulated_v += (float)mouse_report.y / PLOOPY_DRAGSCROLL_DIVISOR_V;
+        scroll_accumulated_h += (float)mouse_report.x / (float)dragscroll_divisor_h; // modified to allow for realtime adjustments
+        scroll_accumulated_v += (float)mouse_report.y / (float)dragscroll_divisor_v; // modified to allow for realtime adjustments
 
         // Assign integer parts of accumulated scroll values to the mouse report
         mouse_report.h = comboscroll_invert * (int8_t)scroll_accumulated_h;     // added `comboscroll_invert * ` for Mac mode
