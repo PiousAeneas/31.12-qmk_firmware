@@ -16,41 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* CONTENTS
-    1. Configuration and State Management
-        - EEPROM struct and initialization
-        - Layer definitions and default settings
-        - Mac Mode toggling
-        - Scroll and DPI settings
-
-    2. Tap Dance Actions
-        - Enum declarations
-        - Handler functions (Mac Toggle, Copy/Cut, Paste Special)
-        - Action mapping
-
-    3. Custom Keycodes
-        - Enum definitions
-        - process_record_user() handling logic for all custom keycodes
-            - Redo, Navigation, Combo Scroll
-            - Layer taps and middle click
-            - DPI and scroll speed adjustment
-            - Quick Reset, Save Settings, Hard Reset
-
-    4. Combos
-        - Layer-dependent combo logic
-        - Combo definitions
-        - Combo action handling (Quick Reset, Save Settings)
-
-    5. Keymaps
-        - Layouts: _RIGHT, _LEFT, _RCLIP, _LCLIP, _SCROLL
-
-    6. Initialization Hooks
-        - keyboard_post_init_user()
-*/
+/* TABLE OF CONTENTS
+ *  --- Definitions and Configuration
+ *  --- Helper Functions
+ *  --- Tap Dance Configuration
+ *  --- Custom Keycodes and Logic
+ *  --- Custom Combos
+ *  --- Keymap Layer Definitions
+ *  --- Hardware Setup
+ */
 
 #include QMK_KEYBOARD_H
 
-// --- DEFINITIONS and HELPER FUNCTIONS ---
+// --- DEFINITIONS AND CONFIGURATION ---
 
 // Define user_config_t as a union to store persistent user settings in EEPROM
 typedef union {
@@ -64,7 +42,7 @@ typedef union {
 
 user_config_t user_config;      // Declare runtime instance used to read/write EEPROM config
 
-// Hardcode persistent defaults for Relative Scroll Speed and Mac Mode
+// Configure persistent default hardcodes for Relative Scroll Speed and Mac Mode
 void eeconfig_init_user(void) {
     user_config.scroll_div = PLOOPY_DRAGSCROLL_DIVISOR_H;  // Default scroll divisor from config.h
     user_config.mac_mode = false;                          // Default Mac mode (off = Win)
@@ -80,7 +58,7 @@ enum layer_names {
     _SCROLL,
 };
 
-// Hardcode persistent default layer
+// Configure persistent default layer hardcode
 #define DEFAULT_LAYER _RIGHT                            // Hardcoded default layer
 static uint8_t current_default_layer = DEFAULT_LAYER;   // Variable to track current default
 
@@ -90,17 +68,30 @@ static uint8_t current_default_layer = DEFAULT_LAYER;   // Variable to track cur
 #define U_UND C(KC_Z)
 #define U_RDO C(KC_Y)
 
-// Combo Drag Scroll
+// Define Combo Drag Scroll variables
 extern bool is_drag_scroll;         // External variable from ploopyco.c
 extern int8_t comboscroll_invert;   // Used to invert scroll directions for Mac
 static uint16_t scroll_timer;       // Timer variable for COMBO_SCROLL
 
-// Timer variable for custom key combos
+// Define timer variables for custom key combos
 static uint16_t reset_timer;        // Timer for RESET combo
 static uint16_t save_timer;         // Timer for SAVE combo
 
-// Boolean and helper function to toggle Mac Mode
+// Define variables for DPI adjustment
+uint16_t custom_dpi_array[] = PLOOPY_DPI_OPTIONS;       // Get options from config.h
+#define DPI_OPTION_SIZE ARRAY_SIZE(custom_dpi_array)    // Used in DPI config logic
+static uint8_t current_dpi  = PLOOPY_DPI_DEFAULT;       // Variable to track DPI
+
+// Define variables for Scroll Speed adjustment
+extern uint16_t dragscroll_divisor_h;   // To track scroll speed adjustments
+extern uint16_t dragscroll_divisor_v;   // To track  scroll speed adjustments
+
+// Define boolean to track Mac Mode
 bool isMac = false;
+
+// --- HELPER FUNCTIONS ---
+
+// Helper function for setting Mac Mode
 void set_mac_mode(bool enable) {
     isMac = enable;
     keymap_config.swap_lctl_lgui = enable; // Swap Left Control and GUI
@@ -108,15 +99,43 @@ void set_mac_mode(bool enable) {
     comboscroll_invert = enable ? -1 : 1;  // Invert scroll directions
 }
 
-// DPI Adjustment
-uint16_t custom_dpi_array[] = PLOOPY_DPI_OPTIONS;       // Get options from config.h
-#define DPI_OPTION_SIZE ARRAY_SIZE(custom_dpi_array)    // Used in DPI config logic
+// Save and Reset helper functions
+void quick_reset(void) { // Reset DPI, Scroll Speed, and Active Layer to last saved defaults
+    current_dpi = keyboard_config.dpi_config;               // Reset to last saved DPI
+    pointing_device_set_cpi(custom_dpi_array[current_dpi]); // Apply DPI
 
-// Scroll Speed Adjustment
-extern uint16_t dragscroll_divisor_h; // for realtime scroll speed adjustments
-extern uint16_t dragscroll_divisor_v; // for realtime scroll speed adjustments
+    dragscroll_divisor_h = user_config.scroll_div;          // Reset to last saved scroll speed
+    dragscroll_divisor_v = user_config.scroll_div;          // Reset to last saved scroll speed
+    
+    is_drag_scroll = 0;                                     // Turn off drag scroll
+    layer_clear();                                          // Clear all layers other than default
+}
 
-// --- TAP DANCE ---
+void save_settings(void) {                          // Save DPI, Scroll Speed, Mac Mode, and Layer
+    keyboard_config.dpi_config = current_dpi;       // Save current DPI
+    eeconfig_update_kb(keyboard_config.raw);        // Write DPI to EEPROM (handled by base ploopyco.c code)
+    
+    user_config.scroll_div = dragscroll_divisor_h;  // Save current scroll divisor
+    user_config.mac_mode   = isMac;                 // Save current Mac Mode state
+    eeconfig_update_user(user_config.raw);          // Write custom user settings to EEPROM
+    
+    set_single_persistent_default_layer(current_default_layer);  // Write current default layer to EEPROM
+}
+
+void hard_reset(void) {  // Quick Reset + Mac Mode and Handedness but from hardcoded defaults
+    eeconfig_init_kb();  // Reset keyboard and user config (DPI, scroll speed, Mac mode)
+    user_config.raw = eeconfig_read_user();     // Read user config from EEPROM into RAM
+    keyboard_config.raw = eeconfig_read_kb();   // Read keyboard config from EEPROM into RAM
+
+    current_default_layer = DEFAULT_LAYER;      // Reset tracked default layer to hardcoded value
+    set_single_persistent_default_layer(current_default_layer);  // Write to persistent memory
+
+    quick_reset();      // Apply DPI, scroll speed, and layer settings via quick reset
+
+    set_mac_mode(user_config.mac_mode);         // Reset Mac Mode from reset user config
+}
+
+// --- TAP DANCE CONFIGURATION ---
 
 // Tap dance declarations
 enum {
@@ -174,7 +193,7 @@ tap_dance_action_t tap_dance_actions[] = {
     [U_TD_PST]      = ACTION_TAP_DANCE_FN(u_td_pst_sp_fn),  // Paste Special
 };
 
-// --- CUSTOM KEYCODES ---
+// --- CUSTOM KEYCODES AND LOGIC ---
 
 // Define custom keycodes
 enum custom_keycodes {
@@ -183,10 +202,7 @@ enum custom_keycodes {
     RET_RGHT, RET_LEFT,         // Return to Base layer from Scroll layer
     DPI_UP, DPI_DOWN,           // Adjust DPI up or down
     SCROLL_UP, SCROLL_DOWN,     // Adjust Scroll speed relative to DPI
-    QUICK_RESET,                // Reset to current default settings
-    ALT_PGUP, ALT_PGDN,         // For QUICK_RESET combos
-    SAVE_SETTINGS,              // Save DPI, Scroll Speed, Mac Mode, and Layer
-    HARD_RESET,                 // Reset to hardcoded defaults
+    ALT_PGUP, ALT_PGDN,         // For reset combos
 };
 
 // Custom keycode handling
@@ -283,18 +299,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // Custom keycodes to adjust DPI and Scroll Speed
     case DPI_UP: // Increase DPI index, but cap at highest option
         if (record->event.pressed) {
-            if (keyboard_config.dpi_config < (DPI_OPTION_SIZE - 1)) {
-                keyboard_config.dpi_config++;
-                pointing_device_set_cpi(custom_dpi_array[keyboard_config.dpi_config]); // Apply new DPI
+            if (current_dpi < (DPI_OPTION_SIZE - 1)) {
+                current_dpi++;
+                pointing_device_set_cpi(custom_dpi_array[current_dpi]); // Apply new DPI
             }
         }
         return false; // Skip further processing
 
     case DPI_DOWN: // Decrease DPI index, but don't go below zero
         if (record->event.pressed) {
-            if (keyboard_config.dpi_config > 0) {
-                keyboard_config.dpi_config--;
-                pointing_device_set_cpi(custom_dpi_array[keyboard_config.dpi_config]); // Apply new DPI
+            if (current_dpi > 0) {
+                current_dpi--;
+                pointing_device_set_cpi(custom_dpi_array[current_dpi]); // Apply new DPI
             }
         }
         return false; // Skip further processing
@@ -313,17 +329,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
         return false;
 
-    case QUICK_RESET: // Reset DPI, Scroll Speed, and Active Layer (but not Mac Mode and Handedness) to current defaults
-        if (record->event.pressed) {
-            keyboard_config.dpi_config = PLOOPY_DPI_DEFAULT;    // Reset to default DPI
-            pointing_device_set_cpi(dpi_array[keyboard_config.dpi_config]); // Apply DPI
-            dragscroll_divisor_h = PLOOPY_DRAGSCROLL_DIVISOR_H; // Reset scroll speed divisors
-            dragscroll_divisor_v = PLOOPY_DRAGSCROLL_DIVISOR_V; // Reset scroll speed divisors
-            is_drag_scroll = 0; // Turn off drag scroll
-            layer_clear();      // Clear all layers other than default layer
-        }
-        return false; // Skip further processing
-
     // Duplicate PGUP and PGDN keys for use with Scroll Layer combos
     case ALT_PGUP:
         if (record->event.pressed) tap_code(KC_PGUP);
@@ -332,40 +337,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (record->event.pressed) tap_code(KC_PGDN);
         return false;
 
-    case SAVE_SETTINGS: // Save current dpi, scroll speed, layer, mac mode to EEPROM
-        user_config.scroll_div = dragscroll_divisor_h;  // save current scroll divisor
-        user_config.mac_mode = isMac;                   // save current Mac Mode state
-        eeconfig_update_user(user_config.raw);          // Writes custom user settings to EEPROM
-        
-        set_single_persistent_default_layer(current_default_layer);  // Write current default layer to EEPROM
-        eeconfig_update_kb(keyboard_config.raw);        // Save DPI setting (handled by base ploopyco.c code)
-
-        return false; // Skip further processing
-
-    case HARD_RESET: // Reset all persistent settings to harcoded defaults
-        eeconfig_init_kb();                             // Resets DPI + user config (scroll speed, mac mode)
-        user_config.raw = eeconfig_read_user();         // Reload user config from EEPROM into RAM
-        keyboard_config.raw = eeconfig_read_kb();       // Reload keyboard config from EEPROM into RAM
-
-        current_default_layer = DEFAULT_LAYER;          // Reset tracked default layer to hardcoded value
-        set_single_persistent_default_layer(current_default_layer);  // Write to persistent memory
-
-        // Apply settings immediately
-        set_mac_mode(user_config.mac_mode);             // Reset Mac Mode
-        pointing_device_set_cpi(dpi_array[keyboard_config.dpi_config]); // Apply DPI
-        dragscroll_divisor_h = user_config.scroll_div;  // Apply scroll divisor (horizontal)
-        dragscroll_divisor_v = user_config.scroll_div;  // Apply scroll divisor (vertical)
-        is_drag_scroll = 0;                             // Turn off drag scroll
-        layer_clear();                                  // Clear all layers other than default layer
-        
-        return false;
-
     default:
         return true; // Process all other keycodes normally
   }
 }
 
-// --- CUSTOM COMBO DEFINITIONS ---
+// --- CUSTOM COMBOS ---
 
 // Layer independent combos - All layers except _SCROLL use _RIGHT as the combo reference layer.
 uint8_t combo_ref_from_layer(uint8_t layer){
@@ -417,10 +394,10 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
             if (pressed) {
                 reset_timer = timer_read(); // Start timer on combo press
             } else {
-                if (timer_elapsed(reset_timer) < TAPPING_TERM) { // Tap → Quick Reset
-                    process_record_user(QUICK_RESET, &(keyrecord_t){.event = {.pressed = true}});
-                } else { // Hold → Hard Reset
-                    process_record_user(HARD_RESET, &(keyrecord_t){.event = {.pressed = true}});
+                if (timer_elapsed(reset_timer) < TAPPING_TERM) {
+                    quick_reset();  // Tap → Quick Reset
+                } else {
+                    hard_reset();   // Hold → Hard Reset
                 }
             }
             break;
@@ -430,8 +407,8 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
             if (pressed) {
                 save_timer = timer_read(); // Start timer on combo press
             } else {
-                if (timer_elapsed(save_timer) >= TAPPING_TERM) { // Hold → Save settings
-                    process_record_user(SAVE_SETTINGS, &(keyrecord_t){.event = {.pressed = true}});
+                if (timer_elapsed(save_timer) >= TAPPING_TERM) {
+                    save_settings();  // Hold → Save Settings
                 }
                 // If released too quickly, do nothing (intentionally ignore tap)
             }
@@ -439,7 +416,7 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
     }
 }
 
-// --- KEYMAP DEFINITIONS ---
+// --- KEYMAP LAYER DEFINITIONS ---
 /* Ploopy Adept Custom Layout = LAYOUT(#1, #2, #3, #4, #5, #6)
  * +---------+-------+-------+---------+
  * |         |       |       |         |
