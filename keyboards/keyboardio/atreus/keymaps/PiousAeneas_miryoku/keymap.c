@@ -398,19 +398,21 @@ bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
 // Caps Word modifications
 bool caps_word_press_user(uint16_t keycode) {
     switch (keycode) {
-        // Deactivate Caps Word only when the following keys are pressed.
-        case KC_ENTER:
-        case KC_ESCAPE:
-        case KC_TAB:
-        case KC_SPACE:
-            return false;
-        // All other keys continue Caps Word.
-        default:
-            // Apply shift to alphabetic keys.
-            if (KC_A <= keycode && keycode <= KC_Z) {
-                add_weak_mods(MOD_BIT(KC_LSFT));
-            }
+        // Keycodes that continue Caps Word, with shift applied.
+        case KC_A ... KC_Z:
+            add_weak_mods(MOD_BIT(KC_LSFT));  // Apply shift to next key.
             return true;
+
+        // Keycodes that continue Caps Word, without shifting.
+        case KC_1 ... KC_0:
+        case KC_BSPC:
+        case KC_DEL:
+        case KC_MINS:
+        case KC_UNDS:
+            return true;
+
+        default:
+            return false;  // Deactivate Caps Word.
     }
 }
 
