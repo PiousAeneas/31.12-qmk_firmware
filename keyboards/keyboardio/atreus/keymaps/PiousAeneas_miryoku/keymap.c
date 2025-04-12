@@ -503,9 +503,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [U_MOUSE] = LAYOUT(
-    OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      KC_ACL2,                                                    U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND,
-    OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      KC_ACL1,                                                    KC_CAPS,            KC_MS_L,            KC_MS_D,        KC_MS_U,        KC_MS_R,
-    KC_NO,              KC_NO,          TD(U_TD_U_MOUSE),   TD(U_TD_U_BASE),    KC_ACL0,            KC_NO,              KC_NO,              KC_INS,             U_WH_L,             U_WH_D,         U_WH_U,         U_WH_R,
+    OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      MS_ACL2,                                                    U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND,
+    OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      MS_ACL1,                                                    KC_CAPS,            MS_LEFT,            MS_DOWN,        MS_UP,          MS_RGHT,
+    KC_NO,              KC_NO,          TD(U_TD_U_MOUSE),   TD(U_TD_U_BASE),    MS_ACL0,            KC_NO,              KC_NO,              KC_INS,             MS_WHLL,            MS_WHLD,        MS_WHLU,        MS_WHLR,
     KC_NO,              KC_NO,          KC_NO,              KC_NO,              KC_NO,              KC_NO,              KC_BTN2,            KC_BTN1,            KC_BTN3,            KC_NO,          KC_NO,          KC_NO
   ),
 
