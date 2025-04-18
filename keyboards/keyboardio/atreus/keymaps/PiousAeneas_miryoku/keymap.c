@@ -413,7 +413,14 @@ bool caps_word_press_user(uint16_t keycode) {
             return false;  // Deactivate Caps Word.
     }
 }
-
+/* Not working yet
+// Create a key override: Shift + Caps Word = Caps Lock
+const key_override_t capsword_key_override = ko_make_basic(MOD_MASK_SHIFT, CW_TOGG, KC_CAPS);
+// This globally defines all key overrides to be used
+const key_override_t *key_overrides[] = {
+    &capsword_key_override
+};
+*/
 // Tapping Term per Key modifications
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
@@ -425,14 +432,15 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
-// ***RESET COMBOS***
+// ***CUSTOM COMBOS***
 // All combos are evaluated from QWERTY Tap Layer (Layer 2)
 enum combos {
-  LAYER_CLEAR_L,
+  LAYER_CLEAR_L,    // Reset Combos
   LAYER_CLEAR_R,
   RESET_BASE_L,
   RESET_BASE_R,
   RESET_KEYBOARD,
+  NUMPAD_ON,        // Num Pad Layer momentary toggle
 };
 
 const uint16_t PROGMEM layer_clear_L_combo[]    = {KC_Z,    KC_B,       COMBO_END};
@@ -440,6 +448,7 @@ const uint16_t PROGMEM layer_clear_R_combo[]    = {KC_N,    KC_SLSH,    COMBO_EN
 const uint16_t PROGMEM reset_base_L_combo[]     = {KC_Q,    KC_T,       KC_Z,   KC_B,       COMBO_END};
 const uint16_t PROGMEM reset_base_R_combo[]     = {KC_Y,    KC_P,       KC_N,   KC_SLSH,    COMBO_END};
 const uint16_t PROGMEM reset_kb_combo[]         = {KC_Q,    KC_P,       KC_Z,   KC_SLSH,    COMBO_END};
+const uint16_t PROGMEM numpad_on_combo[]        = {KC_ENT,  KC_BSPC,    COMBO_END};
 
 combo_t key_combos[]    = {
   [LAYER_CLEAR_L]       = COMBO_ACTION(layer_clear_L_combo),
@@ -447,9 +456,9 @@ combo_t key_combos[]    = {
   [RESET_BASE_L]        = COMBO_ACTION(reset_base_L_combo),
   [RESET_BASE_R]        = COMBO_ACTION(reset_base_R_combo),
   [RESET_KEYBOARD]      = COMBO_ACTION(reset_kb_combo),
+  [NUMPAD_ON]           = COMBO_ACTION(numpad_on_combo),
 };
 
-// Define and handle COMBO_ACTION events
 void process_combo_event(uint16_t combo_index, bool pressed) {
     switch (combo_index) {
 
@@ -463,8 +472,9 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
         case RESET_BASE_L:          // Resets to hardcoded base default layer
         case RESET_BASE_R:
             if (pressed) {
-                current_default_layer = DEFAULT_LAYER;
-                set_single_default_layer(current_default_layer);
+                current_default_layer = DEFAULT_LAYER;              // Update tracking variable to hardcoded default
+                set_single_default_layer(current_default_layer);    // Set as current default
+                layer_clear();                                      // Clear all layers other than default
             }
             break;
 
@@ -475,7 +485,7 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
                 reset_timer = timer_read(); // Start timer on combo press
             } else {
                 if (timer_elapsed(reset_timer) < TAPPING_TERM) {
-                    soft_reset_keyboard();
+                    soft_reset_keyboard();  // Reset keyboard without loading bootloader
                 } else {
                     current_default_layer = DEFAULT_LAYER;  // Reset default layer from hardcode
                     set_single_persistent_default_layer(current_default_layer);
@@ -483,9 +493,34 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
                     eeconfig_init_user();                   // Reset user config (Mac Mode)
                     user_config.raw = eeconfig_read_user(); // Read user config from EEPROM into RAM
                     set_mac_mode(user_config.mac_mode);     // Reset Mac Mode from reset user config
+
+                    soft_reset_keyboard();                  // Reset keyboard without loading bootloader
                 }
             }
             break;
+
+        case NUMPAD_ON: {
+            uint8_t highest = get_highest_layer(layer_state);  // Get currently active layer
+
+            /* Guard clause – exit if:
+             *   1) the default layer is U_TAP,  **or**
+             *   2) the active (highest) layer is NOT one of {U_BASE, U_EXTRA, U_NUMPAD}.
+             */
+            if (current_default_layer == U_TAP ||
+                (highest != U_BASE && highest != U_EXTRA && highest != U_NUMPAD)) {
+                break;
+            }
+
+            /* Key‑down: turn NUMPAD on only from the base alpha layers */
+            if (pressed && (highest == U_BASE || highest == U_EXTRA)) {
+                layer_on(U_NUMPAD);
+            }
+            /* Key‑up: turn NUMPAD off only if it’s currently active and unlocked */
+            else if (!pressed && highest == U_NUMPAD && !is_layer_locked(U_NUMPAD)) {
+                layer_off(U_NUMPAD);
+            }
+            break;
+        }
 
     }
 }
@@ -547,14 +582,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_LBRC,            KC_7,           KC_8,               KC_9,               KC_RBRC,                                                    KC_BSPC,            OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
     KC_SCLN,            KC_4,           KC_5,               KC_6,               KC_EQL,                                                     DM_PLY1,            OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
     KC_GRV,             KC_1,           KC_2,               KC_3,               KC_BSLS,            KC_NO,              KC_NO,              KC_SPC,             TD(U_TD_LLCK),      KC_COMM,        KC_DOT,         KC_SLSH,
-    KC_NO,              KC_NO,          KC_NO,              DM_REC1,            KC_0,               KC_MINS,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
+    KC_NO,              KC_NO,          KC_NO,              DM_RSTP,            KC_0,               KC_MINS,            KC_NO,              KC_NO,              DM_REC1,            KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_SYM] = LAYOUT(
     KC_LCBR,            KC_AMPR,        KC_ASTR,            KC_LPRN,            KC_RCBR,                                                    KC_BSPC,            OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
     KC_COLN,            KC_DLR,         KC_PERC,            KC_CIRC,            KC_PLUS,                                                    DM_PLY2,            OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
     KC_TILD,            KC_EXLM,        KC_AT,              KC_HASH,            KC_PIPE,            KC_NO,              KC_NO,              KC_SPC,             TD(U_TD_LLCK),      KC_COMM,        KC_DOT,         KC_SLSH,
-    KC_NO,              KC_NO,          KC_NO,              DM_REC2,            KC_RPRN,            U_MDASH,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
+    KC_NO,              KC_NO,          KC_NO,              DM_RSTP,            KC_RPRN,            U_MDASH,            KC_NO,              KC_NO,              DM_REC2,            KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_FUN] = LAYOUT(
