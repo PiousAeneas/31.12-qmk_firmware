@@ -17,13 +17,13 @@ Default Base Layer alphas are [Colemak Mod-DH](https://web.archive.org/web/20250
 
 ### Reset Combos
 - **Clear Layers**: Return to the current Default Base Layer from any layer by tapping the bottom two corner keys on any side i.e. the `KC_Z + KC_V` or `KC_K + KC_SLSH` positions based on Colemak Mod-DH Alphas.
-- **Reset Base**: Clear layers *and also* reset default layer to hardcoded Colemak Mod-DH Default Base Layer by tapping all four corner keys on any side i.e. `KC_Z + KC_V + KC_K + KC_SLSH` based on Colemak Mod-DH Alphas. Save to peristent memory by triple-tapping Save key from System or Function Layers.
+- **Reset Base**: Clear layers *and also* reset default layer to hardcoded Colemak Mod-DH Default Base Layer by tapping all four corner keys on any side i.e. `KC_Z + KC_V + KC_K + KC_SLSH` based on Colemak Mod-DH Alphas. Save to persistent memory by triple-tapping Save key from System or Function Layers.
 - **Reset Keyboard**: Reset keyboard - equivalent to unplugging the keyboard and then plugging it back in - by tapping all four corner keys from any layer i.e. the `KC_Q + KC_Z + KC_QUOT + KC_SLSH` positions based on Colemak Mod-DH Alphas.
 - **Hard Reset**: Reset keyboard *and also* reset EEPROM to hardcoded Base Layer Colemak Mod-DH Alphas and Windows Mode (i.e. Mac Mode off) by *holding* all four corner keys from any layer.
 
 ## Secondary Functional Layers
 
-Hold dual-function thumb keys to access secondary functional layers. Per Miryoku, layers are designed with a single purpose per hand and are accessed by holding a thumb key on the opposite hand. Modifiers available on the same hand as the thumb key means that any combination of modifiers and single keys can be produced without any finger contortions. All layers on the same hand are based on the same basic key arrangement.
+Hold dual-function thumb keys to access secondary functional layers. Per Miryoku, layers are designed with a single purpose per hand and are accessed by holding a thumb key on the opposite hand. Modifiers available on the same hand as the thumb key mean that any combination of modifiers and single keys can be produced without any finger contortions. All layers on the same hand are based on the same basic key arrangement.
 - **One-shot Mods**: [One-Shot Mods](https://web.archive.org/web/20250401011249/https://docs.qmk.fm/one_shot_keys#one-shot-keys) for both hands are mirrored from the Base Layer on the same hand as the layer change thumb key. Mods are only enabled on the opposite hand, so auto-repeat is available on the home row on layers for use with cursor and mouse keys.
 - **Layer Lock**: Tap bottom row index column once from any secondary layer to lock the current layer, tap twice to lock the opposite hand's layer. Unlock by tapping the layer lock key once or by initiating any Reset Combo.
 
