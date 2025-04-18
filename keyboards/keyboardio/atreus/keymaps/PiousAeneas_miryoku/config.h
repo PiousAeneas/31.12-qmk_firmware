@@ -7,6 +7,7 @@
 #define CAPS_WORD_IDLE_TIMEOUT 5000	// Reiterates default five second timeout.
 #define PERMISSIVE_HOLD_PER_KEY 	// Selects the hold action when another key is pressed and then released even within the tapping term.
 #define MK_COMBINED 				// Enables momentary keys to set mouse speed to different constants.
+#define COMBO_ONLY_FROM_LAYER 2 	// Evaluate all combos from QWERTY TAP Layer
 
 #define TAPPING_TERM 200 			// Reiterates default value.
 #define TAPPING_TERM_PER_KEY		// For lengthening pinky GUI home row mod.

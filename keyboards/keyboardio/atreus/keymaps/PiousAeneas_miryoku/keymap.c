@@ -4,10 +4,28 @@
 #include QMK_KEYBOARD_H
 
 // ***DEFINITIONS***
+
+// Define user_config_t as a union to store persistent user settings in EEPROM
+typedef union {
+    uint32_t raw;               // Raw 32-bit representation for EEPROM read/write
+    struct {
+        bool mac_mode : 1;      // Mac mode toggle (1 bit)
+    };
+} user_config_t;
+
+user_config_t user_config;      // Declare runtime instance used to read/write EEPROM config
+
+// Set persistent default hardcodes
+void eeconfig_init_user(void) {
+    user_config.mac_mode = false;                          // Default Mac mode (off = Win)
+    eeconfig_update_user(user_config.raw);                 // Save to EECONFIG_USER
+}
+
 // Define Keymap Layers
 enum miryoku_layers {
     U_BASE,
     U_EXTRA,
+    U_TAP,
     U_BUTTON,
     U_NAV,
     U_MOUSE,
@@ -24,98 +42,92 @@ enum miryoku_layers {
 #define U_UND C(KC_Z)
 #define U_RDO C(KC_Y)
 
-// Define boolean to track if Mac Mode is active.
-bool isMac = false; 
+// Configure persistent default layer hardcode
+#define DEFAULT_LAYER U_BASE                            // Hardcoded default layer
+static uint8_t current_default_layer = DEFAULT_LAYER;   // Variable to track current default
+
+// Define helper variables
+static uint16_t reset_timer;                            // Define timer for RESET_KEYBOARD combo
+bool isMac = false;                                     // Define boolean to track Mac Mode
+
+// Helper function for setting Mac Mode
+void set_mac_mode(bool enable) {
+    isMac = enable;
+    keymap_config.swap_lctl_lgui = enable; // Swap Left Control and GUI
+    keymap_config.swap_rctl_rgui = enable; // Swap Right Control and GUI
+}
 
 // ***TAP DANCE***
 // Tap dance declarations
 enum {
-    U_TD_U_NAV,     // Layer Locks
-    U_TD_U_MOUSE,
-    U_TD_U_SYS,
-    U_TD_U_NUM,
-    U_TD_U_SYM,
-    U_TD_U_FUN,
-    U_TD_U_BASE,    // For extra alpha layer
+    U_TD_EXTRA,     // For additional base layers
+    U_TD_LLCK,      // Layer Locks
     U_TD_MAC,       // Mac Mode
     U_TD_PST,       // Paste Special
     U_TD_PSCR,      // Screenshot
 };
 
 // Tap dance helper functions
+
 // Tap dance helper functions: Layer Locks
-void u_td_fn_U_NAV(tap_dance_state_t *state, void *user_data) {
-    if (state->count == 1) {
-        default_layer_set((layer_state_t)1 << U_NAV); // Same layer on single tap
-    } else if (state->count == 2) {
-        default_layer_set((layer_state_t)1 << U_NUM); // Opposite layer on double tap
-    }
-}
-void u_td_fn_U_MOUSE(tap_dance_state_t *state, void *user_data) {
-    if (state->count == 1) {
-        default_layer_set((layer_state_t)1 << U_MOUSE); // Same layer on single tap
-    } else if (state->count == 2) {
-        default_layer_set((layer_state_t)1 << U_SYM); // Opposite layer on double tap
-    }
-}
-void u_td_fn_U_SYS(tap_dance_state_t *state, void *user_data) {
-    if (state->count == 1) {
-        default_layer_set((layer_state_t)1 << U_SYS); // Same layer on single tap
-    } else if (state->count == 2) {
-        default_layer_set((layer_state_t)1 << U_FUN); // Opposite layer on double tap
-    }
-}
-void u_td_fn_U_NUM(tap_dance_state_t *state, void *user_data) {
-    if (state->count == 1) {
-        default_layer_set((layer_state_t)1 << U_NUM); // Same layer on single tap
-    } else if (state->count == 2) {
-        default_layer_set((layer_state_t)1 << U_NAV); // Opposite layer on double tap
-    }
-}
-void u_td_fn_U_SYM(tap_dance_state_t *state, void *user_data) {
-    if (state->count == 1) {
-        default_layer_set((layer_state_t)1 << U_SYM); // Same layer on single tap
-    } else if (state->count == 2) {
-        default_layer_set((layer_state_t)1 << U_MOUSE); // Opposite layer on double tap
-    }
-}
-void u_td_fn_U_FUN(tap_dance_state_t *state, void *user_data) {
-    if (state->count == 1) {
-        default_layer_set((layer_state_t)1 << U_FUN); // Same layer on single tap
-    } else if (state->count == 2) {
-        default_layer_set((layer_state_t)1 << U_SYS); // Opposite layer on double tap
+static uint8_t get_inverse_layer(uint8_t layer) {
+    switch (layer) {
+        case U_NAV:   return U_NUM;     // Navigation ↔ Numbers
+        case U_NUM:   return U_NAV;     // Numbers ↔ Navigation
+        case U_MOUSE: return U_SYM;     // Mouse ↔ Symbols
+        case U_SYM:   return U_MOUSE;   // Symbols ↔ Mouse
+        case U_SYS:   return U_FUN;     // System ↔ Function
+        case U_FUN:   return U_SYS;     // Function ↔ System
+        default:      return UINT8_MAX; // No defined inverse (e.g., BASE layer)
     }
 }
 
-// Tap dance helper functions: Base / Extra Layer
-void u_td_fn_U_BASE(tap_dance_state_t *state, void *user_data) {
+void u_td_fn_llck(tap_dance_state_t *state, void *user_data) {
+    uint8_t current_layer = get_highest_layer(layer_state);  // Get currently active layer
+
     if (state->count == 1) {
-        default_layer_set((layer_state_t)1 << U_BASE); // Base layer on single tap
+        layer_lock_invert(current_layer);  // Toggle lock on current layer (lock/unlock)
     } else if (state->count == 2) {
-        default_layer_set((layer_state_t)1 << U_EXTRA); // Extra layer on double tap
+        uint8_t inverse_layer = get_inverse_layer(current_layer);  // Find the paired layer
+
+        if (inverse_layer != UINT8_MAX) {  // Check if a valid inverse exists
+            layer_lock_on(inverse_layer);  // Lock and turn on invers layer
+        }
+    }
+}
+
+// Tap dance helper functions: Change Default Base Layer
+void u_td_fn_extra(tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        current_default_layer = U_TAP;
+        set_single_default_layer(current_default_layer);            // Tap layer on single tap
+    } else if (state->count == 2) {
+        current_default_layer = U_EXTRA;
+        set_single_default_layer(current_default_layer);            // Extra layer on double tap
+    } else if (state->count == 3) {
+        set_single_persistent_default_layer(current_default_layer); // Save layer to persistent memory
     }
 }
 
 // Tap dance helper functions: Mac Mode
-void u_td_mac_fn(tap_dance_state_t *state, void *user_data) { // 1:Mac, 2:Win
-    switch (state->count) { // Use state->count to determine tap count.
+// 1 tap = Mac mode, 2 taps = Win mode, 3 taps = save to EEPROM
+void u_td_fn_mac(tap_dance_state_t *state, void *user_data) {
+    switch (state->count) {
         case 1:
-            isMac = true; // Turn on Mac Mode.
-            keymap_config.swap_lctl_lgui = true; // Swap Left Control and Left GUI.
-            keymap_config.swap_rctl_rgui = true; // Swap Right Control and Right GUI.
+            set_mac_mode(true);  // Mac mode
             break;
         case 2:
-            isMac = false; // Turn off Mac Mode.
-            keymap_config.swap_lctl_lgui = false;
-            keymap_config.swap_rctl_rgui = false;
+            set_mac_mode(false); // Win mode
             break;
-        default:
-            break; // Do nothing for unexpected tap counts.
+        case 3:
+            user_config.mac_mode = isMac;                // Save current state
+            eeconfig_update_user(user_config.raw);       // Write to EEPROM
+            break;
     }
 }
 
 // Tap dance helper functions: Paste Special tap dance action
-void u_td_pst_sp_fn(tap_dance_state_t *state, void *user_data) { // 1:Paste, 2:Paste Special
+void u_td_fn_pst(tap_dance_state_t *state, void *user_data) { // 1:Paste, 2:Paste Special
     if (isMac) { 
         register_code(KC_LCMD); 
         if (state->count == 2) { // Paste Special requires additional modifiers.
@@ -142,7 +154,7 @@ void u_td_pst_sp_fn(tap_dance_state_t *state, void *user_data) { // 1:Paste, 2:P
 }
 
 // Tap dance helper functions: Screenshot
-void u_td_pscr_fn(tap_dance_state_t *state, void *user_data) {
+void u_td_fn_pscr(tap_dance_state_t *state, void *user_data) {
     switch (state->count) {
         case 1:
             if (isMac) {
@@ -175,17 +187,11 @@ void u_td_pscr_fn(tap_dance_state_t *state, void *user_data) {
 
 // TAP DANCE ACTIONS ARRAY
 tap_dance_action_t tap_dance_actions[] = {
-    [U_TD_U_NAV]    = ACTION_TAP_DANCE_FN(u_td_fn_U_NAV),   // Layer Locks
-    [U_TD_U_MOUSE]  = ACTION_TAP_DANCE_FN(u_td_fn_U_MOUSE),
-    [U_TD_U_SYS]    = ACTION_TAP_DANCE_FN(u_td_fn_U_SYS),
-    [U_TD_U_NUM]    = ACTION_TAP_DANCE_FN(u_td_fn_U_NUM),
-    [U_TD_U_SYM]    = ACTION_TAP_DANCE_FN(u_td_fn_U_SYM),
-    [U_TD_U_FUN]    = ACTION_TAP_DANCE_FN(u_td_fn_U_FUN),
-
-    [U_TD_U_BASE]   = ACTION_TAP_DANCE_FN(u_td_fn_U_BASE),  // Extra Alphas
-    [U_TD_MAC]      = ACTION_TAP_DANCE_FN(u_td_mac_fn),     // Mac Mode
-    [U_TD_PST]      = ACTION_TAP_DANCE_FN(u_td_pst_sp_fn),  // Paste Special
-    [U_TD_PSCR]     = ACTION_TAP_DANCE_FN(u_td_pscr_fn),    // Screenshot
+    [U_TD_EXTRA]    = ACTION_TAP_DANCE_FN(u_td_fn_extra),   // Extra Alphas
+    [U_TD_LLCK]     = ACTION_TAP_DANCE_FN(u_td_fn_llck),    // Layer Locks
+    [U_TD_MAC]      = ACTION_TAP_DANCE_FN(u_td_fn_mac),     // Mac Mode
+    [U_TD_PST]      = ACTION_TAP_DANCE_FN(u_td_fn_pst),     // Paste Special
+    [U_TD_PSCR]     = ACTION_TAP_DANCE_FN(u_td_fn_pscr),    // Screenshot
 };
 
 // Define U_PST as paste special tap dance to work across all keymaps.
@@ -197,7 +203,7 @@ tap_dance_action_t tap_dance_actions[] = {
 enum custom_keycodes {
     U_TABB = SAFE_RANGE, U_TABF,    // Tab navigation
     U_BRWSR_BCK, U_BRWSR_FWD,       // Browser navigation
-    U_WH_L, U_WH_D, U_WH_U, U_WH_R, // Mouse scrolling
+    U_WHLL, U_WHLD, U_WHLU, U_WHLR, // Mouse scrolling
     U_SEARCH,                       // "Spotlight" search
     U_MDASH,                        // Em Dash
     U_XWIN, U_XFRZ,                 // Excel Shortcuts: New Window, Freeze Panes
@@ -255,32 +261,32 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
 
         // Reverse mouse scrolling directions when in Mac mode
-        case U_WH_L:
+        case U_WHLL:
             if (record->event.pressed) {
-                register_code(isMac ? KC_WH_R : KC_WH_L);
+                register_code(isMac ? MS_WHLR : MS_WHLL);
             } else {
-                unregister_code(isMac ? KC_WH_R : KC_WH_L);
+                unregister_code(isMac ? MS_WHLR : MS_WHLL);
             }
             return false;
-        case U_WH_D:
+        case U_WHLD:
             if (record->event.pressed) {
-                register_code(isMac ? KC_WH_U : KC_WH_D);
+                register_code(isMac ? MS_WHLU : MS_WHLD);
             } else {
-                unregister_code(isMac ? KC_WH_U : KC_WH_D);
+                unregister_code(isMac ? MS_WHLU : MS_WHLD);
             }
             return false;
-        case U_WH_U:
+        case U_WHLU:
             if (record->event.pressed) {
-                register_code(isMac ? KC_WH_D : KC_WH_U);
+                register_code(isMac ? MS_WHLD : MS_WHLU);
             } else {
-                unregister_code(isMac ? KC_WH_D : KC_WH_U);
+                unregister_code(isMac ? MS_WHLD : MS_WHLU);
             }
             return false;
-        case U_WH_R:
+        case U_WHLR:
             if (record->event.pressed) {
-                register_code(isMac ? KC_WH_L : KC_WH_R);
+                register_code(isMac ? MS_WHLL : MS_WHLR);
             } else {
-                unregister_code(isMac ? KC_WH_L : KC_WH_R);
+                unregister_code(isMac ? MS_WHLL : MS_WHLR);
             }
             return false;
 
@@ -377,8 +383,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 // Permissive Hold only for home-row shift and layer tap-holds
 bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case LSFT_T(KC_T): // Base Colemak-DH home-row left shift
-        case RSFT_T(KC_N): // Base Colemak-DH home-row right shift
+        case LSFT_T(KC_T): // Colemak-DH home-row left shift
+        case RSFT_T(KC_N): // Colemak-DH home-row right shift
+        case LSFT_T(KC_F): // QWERTY home-row left shift
+        case RSFT_T(KC_J): // QWERTY home-row right shift
         case LT(U_BUTTON,KC_Z): // Layer tap-holds for Base and Extra
         case LT(U_BUTTON,KC_SLSH):
         case LT(U_SYS,KC_ESC):
@@ -395,7 +403,7 @@ bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
-// Caps Word modifications
+// Caps Word modifications: Changes default behavior which shifts KC_MINS.
 bool caps_word_press_user(uint16_t keycode) {
     switch (keycode) {
         // Keycodes that continue Caps Word, with shift applied.
@@ -427,51 +435,70 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
-// ***LAYER LOCK RETURN COMBOS***
-// Combos for returning to Base or Extra Layer after a single-handed layer lock.
+// ***RESET COMBOS***
+// All combos are evaluated from QWERTY Tap Layer (Layer 2)
 enum combos {
-  NAV_TO_BASE,
-  MOUSE_TO_BASE,
-  SYS_TO_BASE,
-  NUM_TO_BASE,
-  SYM_TO_BASE,
-  FUN_TO_BASE,
-  NAV_TO_EXTRA,
-  MOUSE_TO_EXTRA,
-  SYS_TO_EXTRA,
-  NUM_TO_EXTRA,
-  SYM_TO_EXTRA,
-  FUN_TO_EXTRA
+  LAYER_CLEAR_L,
+  LAYER_CLEAR_R,
+  RESET_BASE_L,
+  RESET_BASE_R,
+  RESET_KEYBOARD,
 };
 
-const uint16_t PROGMEM nav_base_combo[]     = {KC_INS,  KC_HOME,    COMBO_END};
-const uint16_t PROGMEM mouse_base_combo[]   = {KC_INS,  U_WH_L,     COMBO_END};
-const uint16_t PROGMEM sys_base_combo[]     = {U_XFRZ,  U_XOUT,     COMBO_END};
-const uint16_t PROGMEM num_base_combo[]     = {KC_3,    KC_BSLS,    COMBO_END};
-const uint16_t PROGMEM sym_base_combo[]     = {KC_HASH, KC_PIPE,    COMBO_END};
-const uint16_t PROGMEM fun_base_combo[]     = {KC_F3,   KC_F13,     COMBO_END};
-
-const uint16_t PROGMEM nav_extra_combo[]    = {KC_INS,  KC_HOME,    KC_PGDN,    COMBO_END};
-const uint16_t PROGMEM mouse_extra_combo[]  = {KC_INS,  U_WH_L,     U_WH_D,     COMBO_END};
-const uint16_t PROGMEM sys_extra_combo[]    = {U_XFRZ,  U_XOUT,     U_XDECDEC,  COMBO_END};
-const uint16_t PROGMEM num_extra_combo[]    = {KC_2,    KC_3,       KC_BSLS,    COMBO_END};
-const uint16_t PROGMEM sym_extra_combo[]    = {KC_AT,   KC_HASH,    KC_PIPE,    COMBO_END};
-const uint16_t PROGMEM fun_extra_combo[]    = {KC_F2,   KC_F3,      KC_F13,     COMBO_END};
+const uint16_t PROGMEM layer_clear_L_combo[]    = {KC_Z,    KC_B,       COMBO_END};
+const uint16_t PROGMEM layer_clear_R_combo[]    = {KC_N,    KC_SLSH,    COMBO_END};
+const uint16_t PROGMEM reset_base_L_combo[]     = {KC_Q,    KC_T,       KC_Z,   KC_B,       COMBO_END};
+const uint16_t PROGMEM reset_base_R_combo[]     = {KC_Y,    KC_P,       KC_N,   KC_SLSH,    COMBO_END};
+const uint16_t PROGMEM reset_kb_combo[]         = {KC_Q,    KC_P,       KC_Z,   KC_SLSH,    COMBO_END};
 
 combo_t key_combos[]    = {
-  [NAV_TO_BASE]         = COMBO(nav_base_combo,     DF(U_BASE)),
-  [MOUSE_TO_BASE]       = COMBO(mouse_base_combo,   DF(U_BASE)),
-  [SYS_TO_BASE]         = COMBO(sys_base_combo,     DF(U_BASE)),
-  [NUM_TO_BASE]         = COMBO(num_base_combo,     DF(U_BASE)),
-  [SYM_TO_BASE]         = COMBO(sym_base_combo,     DF(U_BASE)),
-  [FUN_TO_BASE]         = COMBO(fun_base_combo,     DF(U_BASE)),
-  [NAV_TO_EXTRA]        = COMBO(nav_extra_combo,    DF(U_EXTRA)),
-  [MOUSE_TO_EXTRA]      = COMBO(mouse_extra_combo,  DF(U_EXTRA)),
-  [SYS_TO_EXTRA]        = COMBO(sys_extra_combo,    DF(U_EXTRA)),
-  [NUM_TO_EXTRA]        = COMBO(num_extra_combo,    DF(U_EXTRA)),
-  [SYM_TO_EXTRA]        = COMBO(sym_extra_combo,    DF(U_EXTRA)),
-  [FUN_TO_EXTRA]        = COMBO(fun_extra_combo,    DF(U_EXTRA)),
+  [LAYER_CLEAR_L]       = COMBO_ACTION(layer_clear_L_combo),
+  [LAYER_CLEAR_R]       = COMBO_ACTION(layer_clear_R_combo),
+  [RESET_BASE_L]        = COMBO_ACTION(reset_base_L_combo),
+  [RESET_BASE_R]        = COMBO_ACTION(reset_base_R_combo),
+  [RESET_KEYBOARD]      = COMBO_ACTION(reset_kb_combo),
 };
+
+// Define and handle COMBO_ACTION events
+void process_combo_event(uint16_t combo_index, bool pressed) {
+    switch (combo_index) {
+
+        case LAYER_CLEAR_L:
+        case LAYER_CLEAR_R:
+            if (pressed) {
+                layer_clear();      // Clears all layers (turns them all off).
+            }
+            break;
+
+        case RESET_BASE_L:          // Resets to hardcoded base default layer
+        case RESET_BASE_R:
+            if (pressed) {
+                current_default_layer = DEFAULT_LAYER;
+                set_single_default_layer(current_default_layer);
+            }
+            break;
+
+        case RESET_KEYBOARD:
+        // Tap resets keyboard without loading the bootloader.
+        // Hold resets persistent memory to hardcoded default layer and Mac mode.
+            if (pressed) {
+                reset_timer = timer_read(); // Start timer on combo press
+            } else {
+                if (timer_elapsed(reset_timer) < TAPPING_TERM) {
+                    soft_reset_keyboard();
+                } else {
+                    current_default_layer = DEFAULT_LAYER;  // Reset default layer from hardcode
+                    set_single_persistent_default_layer(current_default_layer);
+
+                    eeconfig_init_user();                   // Reset user config (Mac Mode)
+                    user_config.raw = eeconfig_read_user(); // Read user config from EEPROM into RAM
+                    set_mac_mode(user_config.mac_mode);     // Reset Mac Mode from reset user config
+                }
+            }
+            break;
+
+    }
+}
 
 // ***KEYMAP DEFINITIONS***
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -484,10 +511,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [U_EXTRA] = LAYOUT( // QWERTY
+    RGUI_T(KC_Q),       ALGR_T(KC_W),   RCTL_T(KC_E),       RSFT_T(KC_R),       KC_T,                                                       KC_Y,               LSFT_T(KC_U),       LCTL_T(KC_I),   ALGR_T(KC_O),   LGUI_T(KC_P),
+    LGUI_T(KC_A),       LALT_T(KC_S),   LCTL_T(KC_D),       LSFT_T(KC_F),       KC_G,                                                       KC_H,               RSFT_T(KC_J),       RCTL_T(KC_K),   LALT_T(KC_L),   RGUI_T(KC_QUOT),
+    LT(U_BUTTON,KC_Z),  KC_X,           KC_C,               KC_V,               KC_B,               KC_NO,              KC_NO,              KC_N,               KC_M,               KC_COMM,        KC_DOT,         LT(U_BUTTON,KC_SLSH),
+    KC_NO,              KC_NO,          KC_NO,              LT(U_SYS,KC_ESC),   LT(U_NAV,KC_SPC),   LT(U_MOUSE,KC_TAB), LT(U_SYM,KC_ENT),   LT(U_NUM,KC_BSPC),  LT(U_FUN,KC_DEL),   KC_NO,          KC_NO,          KC_NO
+  ),
+
+  [U_TAP]   = LAYOUT( // Single-Action QWERTY
     KC_Q,               KC_W,           KC_E,               KC_R,               KC_T,                                                       KC_Y,               KC_U,               KC_I,           KC_O,           KC_P,
     KC_A,               KC_S,           KC_D,               KC_F,               KC_G,                                                       KC_H,               KC_J,               KC_K,           KC_L,           KC_QUOT,
     KC_Z,               KC_X,           KC_C,               KC_V,               KC_B,               KC_NO,              KC_NO,              KC_N,               KC_M,               KC_COMM,        KC_DOT,         KC_SLSH,
-    KC_NO,              KC_NO,          KC_NO,              LT(U_SYS,KC_ESC),   LT(U_NAV,KC_SPC),   LT(U_MOUSE,KC_TAB), LT(U_SYM,KC_ENT),   LT(U_NUM,KC_BSPC),  LT(U_FUN,KC_DEL),   KC_NO,          KC_NO,          KC_NO
+    KC_NO,              KC_NO,          KC_NO,              KC_ESC,             KC_SPC,             KC_TAB,             KC_ENT,             KC_BSPC,            KC_DEL,             KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_BUTTON] = LAYOUT(
@@ -500,21 +534,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [U_NAV] = LAYOUT(
     OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      KC_NO,                                                      U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND,
     OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      KC_NO,                                                      CW_TOGG,            KC_LEFT,            KC_DOWN,        KC_UP,          KC_RGHT,
-    KC_NUM_LOCK,        U_NPON,         TD(U_TD_U_NAV),     TD(U_TD_U_BASE),    KC_NO,              KC_NO,              KC_NO,              KC_INS,             KC_HOME,            KC_PGDN,        KC_PGUP,        KC_END,
+    KC_NUM_LOCK,        U_NPON,         KC_NO,              TD(U_TD_LLCK),      KC_NO,              KC_NO,              KC_NO,              KC_INS,             KC_HOME,            KC_PGDN,        KC_PGUP,        KC_END,
     KC_NO,              KC_NO,          KC_NO,              KC_NO,              KC_NO,              KC_NO,              KC_ENT,             KC_BSPC,            KC_DEL,             KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_MOUSE] = LAYOUT(
     OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      MS_ACL2,                                                    U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND,
     OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      MS_ACL1,                                                    KC_CAPS,            MS_LEFT,            MS_DOWN,        MS_UP,          MS_RGHT,
-    KC_NO,              KC_NO,          TD(U_TD_U_MOUSE),   TD(U_TD_U_BASE),    MS_ACL0,            KC_NO,              KC_NO,              KC_INS,             MS_WHLL,            MS_WHLD,        MS_WHLU,        MS_WHLR,
+    KC_NO,              KC_NO,          KC_NO,              TD(U_TD_LLCK),      MS_ACL0,            KC_NO,              KC_NO,              KC_INS,             U_WHLL,             U_WHLD,         U_WHLU,         U_WHLR,
     KC_NO,              KC_NO,          KC_NO,              KC_NO,              KC_NO,              KC_NO,              KC_BTN2,            KC_BTN1,            KC_BTN3,            KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_SYS] = LAYOUT(
     OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      TD(U_TD_PSCR),                                              U_XWIN,             U_BRWSR_BCK,        U_TABB,         U_TABF,         U_BRWSR_FWD,
     OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      KC_SCRL,                                                    U_SEARCH,           KC_MPRV,            KC_VOLD,        KC_VOLU,        KC_MNXT,
-    QK_BOOT,            TD(U_TD_MAC),   TD(U_TD_U_SYS),     TD(U_TD_U_BASE),    KC_PAUS,            KC_NO,              KC_NO,              U_XFRZ,             U_XOUT,             U_XDECDEC,      U_XDECINC,      U_XIND,
+    QK_BOOT,            TD(U_TD_MAC),   TD(U_TD_EXTRA),     TD(U_TD_LLCK),      KC_PAUS,            KC_NO,              KC_NO,              U_XFRZ,             U_XOUT,             U_XDECDEC,      U_XDECINC,      U_XIND,
     KC_NO,              KC_NO,          KC_NO,              KC_NO,              KC_NO,              KC_NO,              KC_MSTP,            KC_MPLY,            KC_MUTE,            KC_NO,          KC_NO,          KC_NO
 
   ),
@@ -522,21 +556,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [U_NUM] = LAYOUT(
     KC_LBRC,            KC_7,           KC_8,               KC_9,               KC_RBRC,                                                    KC_NO,              OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
     KC_SCLN,            KC_4,           KC_5,               KC_6,               KC_EQL,                                                     KC_SPC,             OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
-    KC_GRV,             KC_1,           KC_2,               KC_3,               KC_BSLS,            KC_NO,              KC_NO,              KC_NO,              TD(U_TD_U_BASE),    TD(U_TD_U_NUM), KC_DOT,         KC_SLSH,
+    KC_GRV,             KC_1,           KC_2,               KC_3,               KC_BSLS,            KC_NO,              KC_NO,              KC_NO,              TD(U_TD_LLCK),      KC_COMM,        KC_DOT,         KC_SLSH,
     KC_NO,              KC_NO,          KC_NO,              KC_DOT,             KC_0,               KC_MINS,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_SYM] = LAYOUT(
     KC_LCBR,            KC_AMPR,        KC_ASTR,            KC_LPRN,            KC_RCBR,                                                    KC_NO,              OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
     KC_COLN,            KC_DLR,         KC_PERC,            KC_CIRC,            KC_PLUS,                                                    KC_SPC,             OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
-    KC_TILD,            KC_EXLM,        KC_AT,              KC_HASH,            KC_PIPE,            KC_NO,              KC_NO,              KC_NO,              TD(U_TD_U_BASE),    TD(U_TD_U_SYM), KC_DOT,         KC_SLSH,
+    KC_TILD,            KC_EXLM,        KC_AT,              KC_HASH,            KC_PIPE,            KC_NO,              KC_NO,              KC_NO,              TD(U_TD_LLCK),      KC_COMM,        KC_DOT,         KC_SLSH,
     KC_NO,              KC_NO,          KC_NO,              KC_LPRN,            KC_RPRN,            U_MDASH,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_FUN] = LAYOUT(
     KC_F12,             KC_F7,          KC_F8,              KC_F9,              KC_F15,                                                     TD(U_TD_PSCR),      OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
     KC_F11,             KC_F4,          KC_F5,              KC_F6,              KC_F14,                                                     KC_SCRL,            OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
-    KC_F10,             KC_F1,          KC_F2,              KC_F3,              KC_F13,             KC_NO,              KC_NO,              KC_PAUS,            TD(U_TD_U_BASE),    TD(U_TD_U_FUN), TD(U_TD_MAC),   QK_BOOT,
+    KC_F10,             KC_F1,          KC_F2,              KC_F3,              KC_F13,             KC_NO,              KC_NO,              KC_PAUS,            TD(U_TD_LLCK),      TD(U_TD_EXTRA), TD(U_TD_MAC),   QK_BOOT,
     KC_NO,              KC_NO,          KC_NO,              KC_APP,             KC_SPC,             KC_TAB,             KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
   ),
 
@@ -547,3 +581,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_NO,              KC_NO,          KC_NO,              KC_ESC,            KC_SPC,              KC_TAB,             KC_PCMM,            KC_P0,              KC_PDOT,            KC_NO,          KC_NO,          KC_NO
   ),
 };
+
+// --- HARDWARE SETUP ---
+// Restore user settings from EEPROM after QMK and keyboard init
+void keyboard_post_init_user(void) {
+    user_config.raw = eeconfig_read_user();             // Load saved user config from EEPROM
+    set_mac_mode(user_config.mac_mode);                 // Apply saved Mac/Win mode setting
+}
