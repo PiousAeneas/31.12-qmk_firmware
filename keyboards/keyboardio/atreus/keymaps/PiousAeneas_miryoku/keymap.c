@@ -3,7 +3,7 @@
 
 #include QMK_KEYBOARD_H
 
-// ***DEFINITIONS***
+// --- DEFINITIONS ---
 
 // Define user_config_t as a union to store persistent user settings in EEPROM
 typedef union {
@@ -57,7 +57,7 @@ void set_mac_mode(bool enable) {
     keymap_config.swap_rctl_rgui = enable; // Swap Right Control and GUI
 }
 
-// ***TAP DANCE***
+// --- TAP DANCE ---
 // Tap dance declarations
 enum {
     U_TD_EXTRA,     // For additional base layers
@@ -198,7 +198,7 @@ tap_dance_action_t tap_dance_actions[] = {
 #define U_PST TD(U_TD_PST)
 
 
-// ***CUSTOM KEYCODES***
+// --- CUSTOM KEYCODES ---
 // Custom keycode declarations
 enum custom_keycodes {
     U_TABB = SAFE_RANGE, U_TABF,    // Tab navigation
@@ -206,6 +206,7 @@ enum custom_keycodes {
     U_WHLL, U_WHLD, U_WHLU, U_WHLR, // Mouse scrolling
     U_SEARCH,                       // "Spotlight" search
     U_MDASH,                        // Em Dash
+    U_CAPSWORD,                     // Shift + Caps Word = Caps Lock
     U_XWIN, U_XFRZ,                 // Excel Shortcuts: New Window, Freeze Panes
     U_XIND, U_XOUT,                 // Excel Shortcuts: Indent, Outdent
     U_XDECINC, U_XDECDEC,           // Excel Shortcuts: Increase / Decrease Decimal
@@ -324,6 +325,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
+        case U_CAPSWORD:
+            if (record->event.pressed) {
+                // Check if Shift is held (normal or one-shot)
+                uint8_t active_mods = get_mods() | get_oneshot_mods();
+                if (active_mods & MOD_MASK_SHIFT) {
+                    tap_code(KC_CAPS);          // Send Caps Lock if any shift is active
+                } else {
+                    caps_word_toggle();         // Otherwise, toggle Caps Word
+                }
+            }
+            return false;
+
         // Excel Shortcuts
         case U_XWIN:
         case U_XFRZ:
@@ -369,7 +382,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
-// ***FEATURE MODIFICATIONS***
+// --- FEATURE MODIFICATIONS ---
 // Permissive Hold only for home-row shift and layer tap-holds
 bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
@@ -413,14 +426,7 @@ bool caps_word_press_user(uint16_t keycode) {
             return false;  // Deactivate Caps Word.
     }
 }
-/* Not working yet
-// Create a key override: Shift + Caps Word = Caps Lock
-const key_override_t capsword_key_override = ko_make_basic(MOD_MASK_SHIFT, CW_TOGG, KC_CAPS);
-// This globally defines all key overrides to be used
-const key_override_t *key_overrides[] = {
-    &capsword_key_override
-};
-*/
+
 // Tapping Term per Key modifications
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
@@ -432,7 +438,7 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
-// ***CUSTOM COMBOS***
+// --- CUSTOM COMBOS ---
 // All combos are evaluated from QWERTY Tap Layer (Layer 2)
 enum combos {
   LAYER_CLEAR_L,    // Reset Combos
@@ -525,7 +531,7 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
     }
 }
 
-// ***KEYMAP DEFINITIONS***
+// --- KEYMAP DEFINITIONS ---
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [U_BASE] = LAYOUT( // Colemak-DH
@@ -558,7 +564,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [U_NAV] = LAYOUT(
     OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      KC_NO,                                                      U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND,
-    OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      KC_NO,                                                      CW_TOGG,            KC_LEFT,            KC_DOWN,        KC_UP,          KC_RGHT,
+    OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      KC_NO,                                                      U_CAPSWORD,         KC_LEFT,            KC_DOWN,        KC_UP,          KC_RGHT,
     KC_NO,              KC_NO,          KC_NO,              TD(U_TD_LLCK),      KC_NO,              KC_NO,              KC_NO,              KC_INS,             KC_HOME,            KC_PGDN,        KC_PGUP,        KC_END,
     KC_NO,              KC_NO,          KC_NO,              KC_NO,              KC_NO,              KC_NO,              KC_ENT,             KC_BSPC,            KC_DEL,             KC_NO,          KC_NO,          KC_NO
   ),
