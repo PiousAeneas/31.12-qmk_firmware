@@ -209,7 +209,6 @@ enum custom_keycodes {
     U_XWIN, U_XFRZ,                 // Excel Shortcuts: New Window, Freeze Panes
     U_XIND, U_XOUT,                 // Excel Shortcuts: Indent, Outdent
     U_XDECINC, U_XDECDEC,           // Excel Shortcuts: Increase / Decrease Decimal
-    U_NPON,                         // Activates Num Pad and turns on Num Lock
 };
 
 // Custom keycode handling
@@ -364,16 +363,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
-        // Activate Num Pad and Num Lock
-        case U_NPON:
-            if (record->event.pressed) {
-                if (!host_keyboard_led_state().num_lock) {
-                    tap_code(KC_NUM_LOCK); // Tap NumLock if NumLock is OFF.
-                }
-                layer_on(U_NUMPAD);
-            }
-            return false; // Skip all further processing of this key.
-
+        // Process all other keycodes normally
         default:
             return true;
     }
@@ -534,7 +524,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [U_NAV] = LAYOUT(
     OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),      KC_NO,                                                      U_RDO,              U_PST,              U_CPY,          U_CUT,          U_UND,
     OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),      KC_NO,                                                      CW_TOGG,            KC_LEFT,            KC_DOWN,        KC_UP,          KC_RGHT,
-    KC_NUM_LOCK,        U_NPON,         KC_NO,              TD(U_TD_LLCK),      KC_NO,              KC_NO,              KC_NO,              KC_INS,             KC_HOME,            KC_PGDN,        KC_PGUP,        KC_END,
+    KC_NO,              KC_NO,          KC_NO,              TD(U_TD_LLCK),      KC_NO,              KC_NO,              KC_NO,              KC_INS,             KC_HOME,            KC_PGDN,        KC_PGUP,        KC_END,
     KC_NO,              KC_NO,          KC_NO,              KC_NO,              KC_NO,              KC_NO,              KC_ENT,             KC_BSPC,            KC_DEL,             KC_NO,          KC_NO,          KC_NO
   ),
 
@@ -554,17 +544,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [U_NUM] = LAYOUT(
-    KC_LBRC,            KC_7,           KC_8,               KC_9,               KC_RBRC,                                                    KC_NO,              OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
-    KC_SCLN,            KC_4,           KC_5,               KC_6,               KC_EQL,                                                     KC_SPC,             OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
-    KC_GRV,             KC_1,           KC_2,               KC_3,               KC_BSLS,            KC_NO,              KC_NO,              KC_NO,              TD(U_TD_LLCK),      KC_COMM,        KC_DOT,         KC_SLSH,
-    KC_NO,              KC_NO,          KC_NO,              KC_DOT,             KC_0,               KC_MINS,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
+    KC_LBRC,            KC_7,           KC_8,               KC_9,               KC_RBRC,                                                    KC_BSPC,            OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
+    KC_SCLN,            KC_4,           KC_5,               KC_6,               KC_EQL,                                                     DM_PLY1,            OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
+    KC_GRV,             KC_1,           KC_2,               KC_3,               KC_BSLS,            KC_NO,              KC_NO,              KC_SPC,             TD(U_TD_LLCK),      KC_COMM,        KC_DOT,         KC_SLSH,
+    KC_NO,              KC_NO,          KC_NO,              DM_REC1,            KC_0,               KC_MINS,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_SYM] = LAYOUT(
-    KC_LCBR,            KC_AMPR,        KC_ASTR,            KC_LPRN,            KC_RCBR,                                                    KC_NO,              OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
-    KC_COLN,            KC_DLR,         KC_PERC,            KC_CIRC,            KC_PLUS,                                                    KC_SPC,             OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
-    KC_TILD,            KC_EXLM,        KC_AT,              KC_HASH,            KC_PIPE,            KC_NO,              KC_NO,              KC_NO,              TD(U_TD_LLCK),      KC_COMM,        KC_DOT,         KC_SLSH,
-    KC_NO,              KC_NO,          KC_NO,              KC_LPRN,            KC_RPRN,            U_MDASH,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
+    KC_LCBR,            KC_AMPR,        KC_ASTR,            KC_LPRN,            KC_RCBR,                                                    KC_BSPC,            OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
+    KC_COLN,            KC_DLR,         KC_PERC,            KC_CIRC,            KC_PLUS,                                                    DM_PLY2,            OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
+    KC_TILD,            KC_EXLM,        KC_AT,              KC_HASH,            KC_PIPE,            KC_NO,              KC_NO,              KC_SPC,             TD(U_TD_LLCK),      KC_COMM,        KC_DOT,         KC_SLSH,
+    KC_NO,              KC_NO,          KC_NO,              DM_REC2,            KC_RPRN,            U_MDASH,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
   ),
 
   [U_FUN] = LAYOUT(
@@ -575,10 +565,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   [U_NUMPAD] = LAYOUT(
-    OSM(MOD_RGUI),      OSM(MOD_RALT),  OSM(MOD_RCTL),      OSM(MOD_RSFT),    KC_NO,                                                        KC_PAST,            KC_P7,              KC_P8,          KC_P9,          KC_PMNS,
-    OSM(MOD_LGUI),      OSM(MOD_LALT),  OSM(MOD_LCTL),      OSM(MOD_LSFT),    KC_BSPC,                                                      KC_PEQL,            KC_P4,              KC_P5,          KC_P6,          KC_PPLS,
-    KC_NUM_LOCK,        TG(U_NUMPAD),   KC_NO,              TG(U_NUMPAD),     KC_NO,                KC_NO,              KC_NO,              KC_PSLS,            KC_P1,              KC_P2,          KC_P3,          KC_PENT,
-    KC_NO,              KC_NO,          KC_NO,              KC_ESC,            KC_SPC,              KC_TAB,             KC_PCMM,            KC_P0,              KC_PDOT,            KC_NO,          KC_NO,          KC_NO
+    KC_PAST,            KC_P7,          KC_P8,              KC_P9,              KC_PMNS,                                                    KC_BSPC,            OSM(MOD_LSFT),      OSM(MOD_LCTL),  OSM(MOD_RALT),  OSM(MOD_LGUI),
+    KC_PEQL,            KC_P4,          KC_P5,              KC_P6,              KC_PPLS,                                                    KC_NUM,             OSM(MOD_RSFT),      OSM(MOD_RCTL),  OSM(MOD_LALT),  OSM(MOD_RGUI),
+    KC_PSLS,            KC_P1,          KC_P2,              KC_P3,              KC_PENT,            KC_NO,              KC_NO,              KC_SPC,             TD(U_TD_LLCK),      KC_COMM,        KC_DOT,         KC_SLSH,
+    KC_NO,              KC_NO,          KC_NO,              KC_PCMM,            KC_P0,              KC_PDOT,            KC_NO,              KC_NO,              KC_NO,              KC_NO,          KC_NO,          KC_NO
   ),
 };
 
