@@ -2,7 +2,7 @@
 
 ![Custom Keymap](layout/keyboard-layout-PiousAeneas-miryoku.png)
 
-A custom keyboard layout adapted heavily from Manna Harbour's [Miryoku](https://github.com/manna-harbour/miryoku) layout.
+A custom keyboard layout adapted heavily from Manna Harbour's [Miryoku](https://web.archive.org/web/20250403150058/https://github.com/manna-harbour/miryoku/tree/master/docs/reference) layout.
 - Compile firmware by typing: `qmk compile -kb keyboardio/atreus -km PiousAeneas_miryoku`.
 
 ```
