@@ -91,7 +91,7 @@ void u_td_fn_llck(tap_dance_state_t *state, void *user_data) {
         uint8_t inverse_layer = get_inverse_layer(current_layer);  // Find the paired layer
 
         if (inverse_layer != UINT8_MAX) {  // Check if a valid inverse exists
-            layer_lock_on(inverse_layer);  // Lock and turn on invers layer
+            layer_lock_on(inverse_layer);  // Lock and turn on inverse layer
         }
     }
 }
