@@ -5,6 +5,22 @@
 A custom keyboard layout adapted heavily from Manna Harbour's [Miryoku](https://github.com/manna-harbour/miryoku) layout.
 - Compile firmware by typing: `qmk compile -kb keyboardio/atreus -km PiousAeneas_miryoku`.
 
+```
+| #  | Layer Name | Activation Method                      | Purpose                                    |
+|----|------------|----------------------------------------|--------------------------------------------|
+| 0  | Base       | Default                                | Main typing layer (Colemak Mod-DH)         |
+| 1  | Extra      | Double-tap Extra Alphas key            | QWERTY alternative layout                  |
+| 2  | Tap        | Single-tap Extra Alphas key            | Gaming/timing-sensitive input              |
+| 3  | Button     | Hold bottom-row pinky key              | Mouse buttons, clipboard, modifier keys    |
+| 4  | Navigation | Hold primary right thumb key           | Arrows, navigation, Caps Word, auto-repeat |
+| 5  | Mouse      | Hold secondary right thumb key         | Mouse emulation and scrolling              |
+| 6  | System     | Hold tertiary right thumb key          | Media, OS, Excel macros, mode toggles      |
+| 7  | Number     | Hold primary left thumb key            | Number row (auto-shift), symbols, macro    |
+| 8  | Symbol     | Hold secondary left thumb key   	   | Shifted symbols, secondary macro           |
+| 9  | Function   | Hold tertiary left thumb key           | Function keys, App/Menu, auto-repeat       |
+| 10 | Num Pad    | Right thumb primary + secondary combo  | Full numpad keycodes, alt codes            |
+```
+
 ## Primary Alpha Layers
 
 Default Base Layer alphas are [Colemak Mod-DH](https://web.archive.org/web/20250405062747/https://colemakmods.github.io/mod-dh/).
@@ -27,7 +43,7 @@ Hold dual-function thumb keys to access secondary functional layers. Per Miryoku
 - **One-shot Mods**: [One-Shot Mods](https://web.archive.org/web/20250401011249/https://docs.qmk.fm/one_shot_keys#one-shot-keys) for both hands are mirrored from the Base Layer on the same hand as the layer change thumb key. Mods are only enabled on the opposite hand, so auto-repeat is available on the home row on layers for use with cursor and mouse keys.
 - **Layer Lock**: Tap bottom row index column once from any secondary layer to lock the current layer, tap twice to lock the opposite hand's layer. Unlock by tapping the layer lock key once or by initiating any Reset Combo.
 
-**Number and Symbol Layers**: Numbers and Symbols are available on the left hand with numerals in standard numbad locations with symbols in the remaing positions. **Auto Shift** is enabled for numbers and symbols, simply hold the key to get its shifted state. Symbol layer has shifted symbols in the same locations as the Number Layer.
+**Number and Symbol Layers**: Numbers and Symbols are available on the left hand with numerals in standard numpad locations with symbols in the remaining positions. **Auto Shift** is enabled for numbers and symbols, simply hold the key to get its shifted state. Symbol layer has shifted symbols in the same locations as the Number Layer.
 - **Dynamic Macros**: The keyboard supports temporary macros up to a combined total of 128 keypresses. Per [QMK](https://web.archive.org/web/20250404132651/https://docs.qmk.fm/features/dynamic_macros) they are defined by the user and lost when the keyboard is unplugged or rebooted. Start recording Macro 1 or Macro 2 by tapping the tertiary thumb key. Replay macros by tapping the same-hand inner-column key. Finish the macro that is currently being recorded by simultaneously combo-tapping the primary and secondary right-hand thumb keys i.e. the Number and Symbol layer-change keys.
 - **Num Pad Layer**: Combo the primary and secondary left hand thumb keys (similar to the [Miryoku mod](https://web.archive.org/web/20250403090449/https://github.com/manna-harbour/miryoku_qmk/tree/miryoku/users/manna-harbour_miryoku#thumb-combos) for keyboards with only two thumb keys) to access the Num Pad Layer which provides all [number pad variants](https://web.archive.org/web/20250411163123/https://docs.qmk.fm/keycodes_basic#number-pad) of QMK keycodes for use in certain applications and for functionality such as alt codes.
 
@@ -38,9 +54,9 @@ Hold dual-function thumb keys to access secondary functional layers. Per Miryoku
 **System Layer**: Tertiary right-hand layer provides media control, browser navigation, system shortcuts, and Microsoft Excel keyboard macros that all mirror the directional keys from the Navigation and Mouse Layers. `Pause`, `Stop`, and `Mute` are on the primary, secondary, and tertiary thumbs, respectively. System keys are on the same-hand inner and bottom column:
 - **Screen Shot**: Double-tap `Snip` for `Print Screen`.
 - **Extra Alphas**: Single tap for Tap Layer, double tap for Extra QWERTY Layer, triple tap to save the current default layer into persistent memory.
-- **Mac Mode**: Single tap for for Mac mode, double tap for to Windows mode, triple tap to save current mode into persistent memory. Mac Mode swaps `GUI` with `Control`, reverses scroll directions, and changes OS-specific shortcuts for clipboard functions, print screen, system search, and browser navigation.
+- **Mac Mode**: Single tap for for Mac mode, double tap for Windows mode, triple tap to save current mode into persistent memory. Mac Mode swaps `GUI` with `Control`, reverses scroll directions, and changes OS-specific shortcuts for clipboard functions, print screen, system search, and browser navigation.
 - **Boot**: Tap same-hand pinky column for `QK_BOOT` which resets keyboard into bootloader mode (Keyboardio Atreus also requires you to simultaneously hold the bottom left key).
 
-**Function Layer**: Function keys mirror numerals from the Number Layer with extras on the pinkie and inner columns. `App` Context Menu key is on the tertiary thumb key and other thumb keys are duplicated from the Base Layer to enable **auto-repeat**. Same-hand system keys are mirrored from the System Layer.
+**Function Layer**: Function keys mirror numerals from the Number Layer with extras on the pinky and inner columns. `App` Context Menu key is on the tertiary thumb key and other thumb keys are duplicated from the Base Layer to enable **auto-repeat**. Same-hand system keys are mirrored from the System Layer.
 
-**Button Layer**: An additional Button Layer provides mouse buttons, keyboard modifiers, and clipboard shortcuts for use with integrated or external pointing devices, used with either hand. It is activated by holding a bottom row pinkie key.
+**Button Layer**: An additional Button Layer provides mouse buttons, keyboard modifiers, and clipboard shortcuts for use with integrated or external pointing devices, used with either hand. It is activated by holding a bottom row pinky key.
