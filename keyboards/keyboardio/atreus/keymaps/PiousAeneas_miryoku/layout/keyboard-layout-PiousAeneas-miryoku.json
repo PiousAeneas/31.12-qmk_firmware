@@ -19,13 +19,10 @@
       "h": 21,
       "d": true
     },
-    "<b>Primary Alpha Layers</b> default to Colemak Mod-DH with a Qwerty Extra Layer available from the Function and System Layers.<br><br> Dual-function home row keys act as modifiers when held, with opposite-hand mods available on the top row. <i>Permissive hold</i> enabled for Shift and all layer-hold thumb keys.<br><br> Auto-repeat is available only on secondary functional layers e.g. auto-repeat backspace by holding left then right primary thumb keys.<br><br> Optional Tap Layer has only single-action keys with auto-repeat and no home-row mod delay.<br><br> <b>Reset Combos</b> are available from any layer:<br><br> Clear Active Layers by tapping the bottom two corner keys on any <i>one</i> side (e.g. <code>K</code>+<code>/</code>).<br><br> Clear Layers <i>and</i> Reset Default to Colemak Mod-DH by tapping the four corner keys on any <i>one</i> side (e.g. QWERTY <code>Q</code>+<code>T</code>+<code>Z</code>+<code>B</code>)<br><br> Soft Reset Keyboard by <i>tapping</i> all four corner keys (e.g. QWERTY <code>Q</code>+<code>P</code>+<code>Z</code>+<code>/</code>) from any layer.<br><br>  Reset keyboard <i>and</i> EEPROM to hardcoded defaults by <i>holding</i> all four corner keys from any layer.<br><br> <b>Secondary Functional Layers</b> are accessed by holding dual-function thumb keys with <i>one-shot mods</i> available on the same hand as the layer change thumb key.<br><br><i>Layer Lock</i> the current layer with a single tap on the same-hand bottom row index column; lock the inverse layer with a double tap.<br><br> <b>Number and Symbol Layers</b> have Auto Shift enabled and an optional Num Pad layer for alt codes, etc.<br><br>Two <i>Dynamic Macros</i> are available and can store a combined total of 128 keypresses. Use <code>REC</code> and <code>RSTP</code> to start and stop recording, and <code>PLY</code> to replay the macro.<br><br><b>Navigation and Mouse Layers</b> use Vim-style cursor keys. Hold the inner column <i class='fa fa-mouse-pointer'></i>-keys to temporarily modify mouse and scrolling speed.<br><br>Caps Lock is available on the secondary thumb layer and also by shifting Caps Word i.e.<br>Shift + CapsWord = CapsLock.<br><br><b>System and Function Layers</b> have system keys on the same hand as the layer change thumb key. Tap same-hand pinky column for <code>QK_BOOT</code> which resets keyboard into bootloader mode.<br><br>Extra Alphas can be set as the default layer as follows: single tap for Tap Layer, double tap for Extra QWERTY Layer, triple tap to save the current default layer into persistent memory.<br><br>OS Toggle for cross-platform compatibility as follows: single tap for Mac mode, double tap for Windows mode, triple tap to save current mode into persistent memory.",
+    "<b>Primary Alpha Layers</b> default to Colemak Mod-DH with a Qwerty Extra Layer available from the Function and System Layers.<br><br> Dual-function home row keys act as modifiers when held, with opposite-hand mods available on the top row. <i>Permissive hold</i> enabled for Shift and all layer-hold thumb keys.<br><br> Auto-repeat is available only on secondary functional layers e.g. auto-repeat backspace by holding left then right primary thumb keys.<br><br> Optional Tap Layer has only single-action keys with auto-repeat and no home-row mod delay.<br><br> <b>Reset Combos</b> are available from any layer:<br><br> Clear Active Layers by tapping the bottom two corner keys on any <i>one</i> side (e.g. <code>K</code>+<code>/</code>).<br><br> Clear Layers <i>and</i> Reset Default to Colemak Mod-DH by tapping the four corner keys on any <i>one</i> side (e.g. QWERTY <code>Q</code>+<code>T</code>+<code>Z</code>+<code>B</code>)<br><br> Soft Reset Keyboard by <i>tapping</i> all four corner keys (e.g. QWERTY <code>Q</code>+<code>P</code>+<code>Z</code>+<code>/</code>) from any layer.<br><br>  Reset keyboard <i>and</i> EEPROM to hardcoded defaults by <i>holding</i> all four corner keys from any layer.<br><br> <b>Secondary Functional Layers</b> are accessed by holding dual-function thumb keys with <i>one-shot mods</i> available on the same hand as the layer change thumb key.<br><br><i>Layer Lock</i> the current layer with a single tap on the same-hand bottom row index column; lock the inverse layer with a double tap.<br><br> <b>Number and Symbol Layers</b> have Auto Shift enabled and an optional Num Pad layer for alt codes, etc. Shifted <code>_</code> is em dash <code>—</code>.<br><br>Two <i>Dynamic Macros</i> are available and can store a combined total of 128 keypresses. Use <code>REC</code> and <code>RSTP</code> to start and stop recording, and <code>PLY</code> to replay the macro.<br><br><b>Navigation and Mouse Layers</b> use Vim-style cursor keys. Hold the inner column <i class='fa fa-mouse-pointer'></i>-keys to temporarily modify mouse and scrolling speed.<br><br>Caps Lock is available on the secondary thumb layer and also by shifting Caps Word i.e.<br>Shift + CapsWord = CapsLock.<br><br><b>System and Function Layers</b> have system keys on the same hand as the layer change thumb key. Tap same-hand pinky column for <code>QK_BOOT</code> which resets keyboard into bootloader mode.<br><br>Extra Alphas can be set as the default layer as follows: single tap for Tap Layer, double tap for Extra QWERTY Layer, triple tap to save the current default layer into persistent memory.<br><br>OS Toggle for cross-platform compatibility as follows: single tap for Mac mode, double tap for Windows mode, triple tap to save current mode into persistent memory.",
     {
       "a": 7,
-      "f": 1,
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "Q\n\n\n\nRGUI",
     "W\n\n\n\nAltGr",
@@ -34,7 +31,6 @@
     "B",
     {
       "a": 5,
-      "f": 3,
       "fa": [
         0,
         0,
@@ -50,11 +46,7 @@
     },
     "\n(Default)\n\n\n\n\n<b>Base<br>Layer</b>",
     {
-      "a": 7,
-      "f": 1,
-      "fa": [
-        3
-      ]
+      "a": 7
     },
     "J",
     "L\n\n\n\nLSFT",
@@ -63,24 +55,12 @@
     },
     "Y\n\n\n\nAltGr",
     {
-      "a": 5,
-      "fa": [
-        3,
-        0,
-        0,
-        0,
-        0,
-        0,
-        3
-      ]
+      "a": 5
     },
-    "\"\n\n\n\nLGUI\n\n'",
+    "\"\n'\n\n\nLGUI",
     {
       "x": 0.25,
-      "a": 7,
-      "fa": [
-        2
-      ]
+      "a": 7
     },
     "Q",
     "W",
@@ -88,7 +68,6 @@
     "R",
     "T",
     {
-      "f": 3,
       "fa": [
         6
       ],
@@ -98,33 +77,33 @@
     },
     "<b>Tap<br>Layer</b>",
     {
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "f": 4
     },
     "Y",
+    {
+      "f": 4
+    },
     "U",
     {
-      "x": 1
+      "x": 1,
+      "f": 4
     },
     "O",
+    {
+      "f": 4
+    },
     "P"
   ],
   [
     {
       "y": -0.99,
       "x": 13,
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "U\n\n\n\nLCTL",
     {
       "x": 11.25,
-      "fa": [
-        2
-      ]
+      "f": 4
     },
     "I"
   ],
@@ -132,86 +111,99 @@
     {
       "y": -0.009999999999999787,
       "x": 4,
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "A\n\n\n\nLGUI",
+    {
+      "f": 4
+    },
     "R\n\n\n\nLALT",
+    {
+      "f": 4
+    },
     "S\n\n\n\nLCTL",
     {
+      "f": 4,
       "n": true
     },
     "T\n\n\n\nLSFT",
+    {
+      "f": 4
+    },
     "G",
     {
-      "x": 2
+      "x": 2,
+      "f": 4
     },
     "M",
     {
+      "f": 4,
       "n": true
     },
     "N\n\n\n\nRSFT",
     {
-      "x": 1
+      "x": 1,
+      "f": 4
     },
     "I\n\n\n\nLALT",
+    {
+      "f": 4
+    },
     "O\n\n\n\nRGUI",
     {
       "x": 0.25,
-      "fa": [
-        2
-      ]
+      "f": 4
     },
     "A",
+    {
+      "f": 4
+    },
     "S",
+    {
+      "f": 4
+    },
     "D",
     {
+      "f": 4,
       "n": true
     },
     "F",
+    {
+      "f": 4
+    },
     "G",
     {
-      "x": 2
+      "x": 2,
+      "f": 4
     },
     "H",
     {
+      "f": 4,
       "n": true
     },
     "J",
     {
-      "x": 1
+      "x": 1,
+      "f": 4
     },
     "L",
     {
       "a": 5,
-      "fa": [
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2
-      ]
+      "f": 4
     },
-    "\"\n\n\n\n\n\n'"
+    "\"\n'"
   ],
   [
     {
       "y": -0.9900000000000002,
       "x": 13,
       "a": 7,
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "E\n\n\n\nRCTL",
     {
       "x": 11.25,
-      "fa": [
-        2
-      ]
+      "f": 4
     },
     "K"
   ],
@@ -219,96 +211,98 @@
     {
       "y": -0.009999999999999787,
       "x": 4,
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "Z\n\n\n\nButton",
+    {
+      "f": 4
+    },
     "X",
+    {
+      "f": 4
+    },
     "C",
+    {
+      "f": 4
+    },
     "D",
+    {
+      "f": 4
+    },
     "V",
     {
-      "x": 2
+      "x": 2,
+      "f": 4
     },
     "K",
+    {
+      "f": 4
+    },
     "H",
     {
       "x": 1,
       "a": 5,
-      "fa": [
-        3,
-        0,
-        0,
-        0,
-        0,
-        0,
-        3
-      ]
+      "f": 4
     },
-    ">\n\n\n\n\n\n.",
-    "?\n\n\n\nButton\n\n/",
+    ">\n.",
+    {
+      "f": 4
+    },
+    "?\n/\n\n\nButton",
     {
       "x": 0.25,
       "a": 7,
-      "fa": [
-        2
-      ]
+      "f": 4
     },
     "Z",
+    {
+      "f": 4
+    },
     "X",
+    {
+      "f": 4
+    },
     "C",
+    {
+      "f": 4
+    },
     "V",
+    {
+      "f": 4
+    },
     "B",
     {
-      "x": 2
+      "x": 2,
+      "f": 4
     },
     "N",
+    {
+      "f": 4
+    },
     "M",
     {
       "x": 1,
       "a": 5,
-      "fa": [
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2
-      ]
+      "f": 4
     },
-    ">\n\n\n\n\n\n.",
-    "?\n\n\n\n\n\n/"
+    ">\n.",
+    {
+      "f": 4
+    },
+    "?\n/"
   ],
   [
     {
       "y": -0.9900000000000002,
       "x": 13,
-      "fa": [
-        3,
-        0,
-        0,
-        0,
-        0,
-        0,
-        3
-      ]
+      "f": 4
     },
-    "<\n\n\n\n\n\n,",
+    "<\n,",
     {
       "x": 11.25,
-      "fa": [
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2
-      ]
+      "f": 4
     },
-    "<\n\n\n\n\n\n,"
+    "<\n,"
   ],
   [
     {
@@ -316,43 +310,59 @@
       "x": 7,
       "t": "#000000\n\n\n\n#bf16db",
       "a": 7,
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "Esc\n\n\n\nSys",
     {
-      "t": "#000000\n\n\n\n#108896"
+      "t": "#000000\n\n\n\n#108896",
+      "f": 4
     },
     "Spc\n\n\n\nNav",
     {
-      "t": "#000000\n\n\n\n#e55b10"
+      "t": "#000000\n\n\n\n#e55b10",
+      "f": 4
     },
     "<i class='kb kb-Tab-1'></i>\n\n\n\nMou",
     {
-      "t": "#000000\n\n\n\n#1c9109"
+      "t": "#000000\n\n\n\n#1c9109",
+      "f": 4
     },
     "<i class='kb kb-Return-2'></i>\n\n\n\nSym",
     {
-      "t": "#000000\n\n\n\n#142fb7"
+      "t": "#000000\n\n\n\n#142fb7",
+      "f": 4
     },
     "<i class='kb kb-Unicode-BackSpace-DeleteLeft-Big'></i>\n\n\n\nNum",
     {
-      "t": "#000000\n\n\n\n#b71446"
+      "t": "#000000\n\n\n\n#b71446",
+      "f": 4
     },
     "<i class='kb kb-Unicode-DeleteRight-Big'></i>\n\n\n\nFun",
     {
       "x": 6.25,
       "t": "#000000",
-      "fa": [
-        2
-      ]
+      "f": 4
     },
     "Esc",
+    {
+      "f": 4
+    },
     "Spc",
+    {
+      "f": 4
+    },
     "<i class='kb kb-Tab-1'></i>",
+    {
+      "f": 4
+    },
     "<i class='kb kb-Return-2'></i>",
+    {
+      "f": 4
+    },
     "<i class='kb kb-Unicode-BackSpace-DeleteLeft-Big'></i>",
+    {
+      "f": 4
+    },
     "<i class='kb kb-Unicode-DeleteRight-Big'></i>"
   ],
   [
@@ -361,26 +371,23 @@
       "x": 4,
       "t": "#142fb7",
       "a": 5,
-      "fa": [
-        2,
-        2
-      ]
+      "f": 4
     },
     "{\n[",
     {
-      "fa": [
-        2,
-        4
-      ]
+      "f": 4
     },
     "&\n7",
+    {
+      "f": 4
+    },
     "*\n8",
+    {
+      "f": 4
+    },
     "(\n9",
     {
-      "fa": [
-        2,
-        2
-      ]
+      "f": 4
     },
     "}\n]",
     {
@@ -397,28 +404,39 @@
     "<b>Number<br>Layer</b>",
     {
       "t": "#142fb7",
-      "f": 2
+      "f": 3
     },
     "Bksp",
     {
       "t": "#595959",
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "LSFT",
     {
-      "x": 1
+      "x": 1,
+      "f": 3
     },
     "AltGr",
+    {
+      "f": 3
+    },
     "LGUI",
     {
-      "x": 0.25
+      "x": 0.25,
+      "f": 3
     },
     "RGUI",
+    {
+      "f": 3
+    },
     "AltGr",
+    {
+      "f": 3
+    },
     "RCTL",
+    {
+      "f": 3
+    },
     "RSFT",
     {
       "t": "#108896"
@@ -426,10 +444,6 @@
     "",
     {
       "t": "#000000",
-      "f": 3,
-      "fa": [
-        6
-      ],
       "w": 2,
       "h": 3,
       "d": true
@@ -437,15 +451,18 @@
     "<b>Navigation<br>Layer</b>",
     {
       "t": "#108896",
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "Redo",
+    {
+      "a": 6,
+      "f": 2
+    },
     "1:Paste<br>2:PstSp",
     {
-      "x": 1
+      "x": 1,
+      "a": 7,
+      "f": 3
     },
     "Cut",
     "Undo"
@@ -469,40 +486,21 @@
       "x": 4,
       "t": "#142fb7",
       "a": 5,
-      "fa": [
-        2,
-        2
-      ]
+      "f": 4
     },
     ":\n;",
-    {
-      "fa": [
-        2,
-        4
-      ]
-    },
     "$\n4",
     "%\n5",
     "^\n6",
-    {
-      "fa": [
-        2,
-        2
-      ]
-    },
     "+\n=",
     {
       "x": 2,
       "a": 7,
-      "f": 2
+      "f": 3
     },
     "PLY1",
     {
-      "t": "#595959",
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "t": "#595959"
     },
     "RSFT",
     {
@@ -526,9 +524,7 @@
     },
     "Caps<br>Word",
     {
-      "fa": [
-        4
-      ]
+      "f": 5
     },
     "<i class='fa fa-caret-left'></i>",
     {
@@ -542,17 +538,13 @@
       "y": -0.9900000000000002,
       "x": 13,
       "t": "#595959",
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "RCTL",
     {
       "x": 11.25,
       "t": "#108896",
-      "fa": [
-        4
-      ]
+      "f": 5
     },
     "<i class='fa fa-caret-down'></i>"
   ],
@@ -562,59 +554,47 @@
       "x": 4,
       "t": "#142fb7",
       "a": 5,
-      "fa": [
-        2,
-        2
-      ]
+      "f": 4
     },
     "~\n`",
-    {
-      "fa": [
-        2,
-        4
-      ]
-    },
     "!\n1",
     "@\n2",
     "#\n3",
-    {
-      "fa": [
-        2,
-        2
-      ]
-    },
     "|\n\\",
     {
       "x": 2,
-      "a": 7
+      "a": 7,
+      "f": 3
     },
     "Spc",
+    {
+      "a": 6
+    },
     "1:Curr<br>2:Opp",
     {
       "x": 1,
       "t": "#595959",
       "a": 5,
-      "fa": [
-        2,
-        2,
-        0,
-        0,
-        0,
-        0,
-        2
-      ]
+      "f": 4
     },
-    ">\n\n\n\n\n\n.",
+    ">\n.",
     "?\n/",
     {
       "x": 0.25,
       "t": "#108896",
-      "a": 7
+      "a": 7,
+      "f": 3
     },
     "",
     "",
     "",
+    {
+      "a": 6
+    },
     "1:Curr<br>2:Opp",
+    {
+      "a": 7
+    },
     "",
     {
       "x": 2
@@ -632,13 +612,15 @@
       "y": -0.9900000000000002,
       "x": 13,
       "t": "#595959",
-      "a": 5
+      "a": 5,
+      "f": 4
     },
-    "<\n\n\n\n\n\n,",
+    "<\n,",
     {
       "x": 11.25,
       "t": "#108896",
-      "a": 7
+      "a": 7,
+      "f": 3
     },
     "PgDn"
   ],
@@ -646,25 +628,14 @@
     {
       "y": -0.009999999999999787,
       "x": 7,
-      "t": "#142fb7",
-      "f": 2
+      "t": "#142fb7"
     },
     "RSTP",
     {
       "a": 5,
-      "f": 1,
-      "fa": [
-        2,
-        4
-      ]
+      "f": 4
     },
     ")\n0",
-    {
-      "fa": [
-        2,
-        2
-      ]
-    },
     "_\n-",
     {
       "a": 7
@@ -676,12 +647,11 @@
     "",
     {
       "g": false,
-      "f": 2
+      "f": 3
     },
     "REC1",
     {
       "t": "#000000",
-      "f": 3,
       "w": 6.25,
       "h": 1.25,
       "d": true
@@ -702,9 +672,7 @@
     "",
     {
       "t": "#595959",
-      "fa": [
-        2
-      ]
+      "f": 4
     },
     "<i class='kb kb-Return-2'></i>",
     "<i class='kb kb-Unicode-BackSpace-DeleteLeft-Big'></i>",
@@ -714,10 +682,7 @@
     {
       "y": 0.25,
       "x": 4,
-      "t": "#1c9109",
-      "fa": [
-        4
-      ]
+      "t": "#1c9109"
     },
     "{",
     "&",
@@ -737,30 +702,43 @@
     "<b>Symbol<br>Layer</b>",
     {
       "t": "#1c9109",
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "Bksp",
     {
-      "t": "#595959"
+      "t": "#595959",
+      "f": 3
     },
     "LSFT",
     {
-      "x": 1
+      "x": 1,
+      "f": 3
     },
     "AltGr",
+    {
+      "f": 3
+    },
     "LGUI",
     {
-      "x": 0.25
+      "x": 0.25,
+      "f": 3
     },
     "RGUI",
+    {
+      "f": 3
+    },
     "AltGr",
+    {
+      "f": 3
+    },
     "RCTL",
+    {
+      "f": 3
+    },
     "RSFT",
     {
-      "t": "#e55b10"
+      "t": "#e55b10",
+      "f": 4
     },
     "<i class='fa fa-mouse-pointer'></I><sub>2",
     {
@@ -776,15 +754,18 @@
     "<b>Mouse<br>Layer</b>",
     {
       "t": "#e55b10",
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "Redo",
+    {
+      "a": 6,
+      "f": 2
+    },
     "1:Paste<br>2:PstSp",
     {
-      "x": 1
+      "x": 1,
+      "a": 7,
+      "f": 3
     },
     "Cut",
     "Undo"
@@ -807,9 +788,7 @@
       "y": -0.009999999999999787,
       "x": 4,
       "t": "#1c9109",
-      "fa": [
-        4
-      ]
+      "f": 4
     },
     ":",
     "$",
@@ -818,15 +797,11 @@
     "+",
     {
       "x": 2,
-      "f": 2
+      "f": 3
     },
     "PLY2",
     {
-      "t": "#595959",
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "t": "#595959"
     },
     "RSFT",
     {
@@ -842,17 +817,17 @@
     "LCTL",
     "LSFT",
     {
-      "t": "#e55b10"
+      "t": "#e55b10",
+      "f": 4
     },
     "<i class='fa fa-mouse-pointer'></I><sub>1",
     {
-      "x": 2
+      "x": 2,
+      "f": 3
     },
     "Caps<br>Lock",
     {
-      "fa": [
-        4
-      ]
+      "f": 5
     },
     "<i class='fa fa-long-arrow-left'></i>",
     {
@@ -866,17 +841,13 @@
       "y": -0.9900000000000002,
       "x": 13,
       "t": "#595959",
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "RCTL",
     {
       "x": 11.25,
       "t": "#e55b10",
-      "fa": [
-        4
-      ]
+      "f": 5
     },
     "<i class='fa fa-long-arrow-down'></i>"
   ],
@@ -884,7 +855,8 @@
     {
       "y": -0.009999999999999787,
       "x": 4,
-      "t": "#1c9109"
+      "t": "#1c9109",
+      "f": 4
     },
     "~",
     "!",
@@ -893,52 +865,46 @@
     "|",
     {
       "x": 2,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "Spc",
+    {
+      "a": 6
+    },
     "1:Curr<br>2:Opp",
     {
       "x": 1,
       "t": "#595959",
       "a": 5,
-      "fa": [
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2
-      ]
+      "f": 4
     },
-    ">\n\n\n\n\n\n.",
-    {
-      "fa": [
-        2,
-        2
-      ]
-    },
+    ">\n.",
     "?\n/",
     {
       "x": 0.25,
       "t": "#e55b10",
-      "a": 7
+      "a": 7,
+      "f": 3
     },
     "",
     "",
     "",
+    {
+      "a": 6
+    },
     "1:Curr<br>2:Opp",
+    {
+      "a": 7,
+      "f": 4
+    },
     "<i class='fa fa-mouse-pointer'></I><sub>0",
     {
-      "x": 2
+      "x": 2,
+      "f": 3
     },
     "Insert",
     {
-      "fa": [
-        4
-      ]
+      "f": 5
     },
     "<i class='fa fa-angle-double-left'></i>",
     {
@@ -953,24 +919,14 @@
       "x": 13,
       "t": "#595959",
       "a": 5,
-      "fa": [
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2
-      ]
+      "f": 4
     },
-    "<\n\n\n\n\n\n,",
+    "<\n,",
     {
       "x": 11.25,
       "t": "#e55b10",
       "a": 7,
-      "fa": [
-        4
-      ]
+      "f": 5
     },
     "<i class='fa fa-angle-double-down'></i>"
   ],
@@ -979,28 +935,28 @@
       "y": -0.009999999999999787,
       "x": 7,
       "t": "#1c9109",
-      "f": 2
+      "f": 3
     },
     "RSTP",
     {
-      "f": 1,
-      "fa": [
-        4
-      ]
+      "f": 4
     },
     ")",
-    "—",
     {
-      "g": true
+      "a": 5
+    },
+    "—\n\n\n\n\n\n_",
+    {
+      "g": true,
+      "a": 7,
+      "f": 1
     },
     "",
     {
-      "g": false
+      "g": false,
+      "f": 3
     },
     "",
-    {
-      "f": 2
-    },
     "REC2",
     {
       "x": 6.25,
@@ -1015,9 +971,7 @@
     "",
     {
       "g": false,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "Right",
     "Left",
@@ -1028,9 +982,7 @@
       "y": 0.25,
       "x": 4,
       "t": "#b71446",
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "F12",
     "F7",
@@ -1050,38 +1002,51 @@
     "<b>Function<br>Layer</b>",
     {
       "t": "#b71446",
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "a": 6,
+      "f": 3
     },
     "1:Snip<br>2:PrtSc",
     {
-      "t": "#595959"
+      "t": "#595959",
+      "a": 7,
+      "f": 3
     },
     "LSFT",
     {
-      "x": 1
+      "x": 1,
+      "f": 3
     },
     "AltGr",
+    {
+      "f": 3
+    },
     "LGUI",
     {
-      "x": 0.25
+      "x": 0.25,
+      "f": 3
     },
     "RGUI",
+    {
+      "f": 3
+    },
     "AltGr",
+    {
+      "f": 3
+    },
     "RCTL",
+    {
+      "f": 3
+    },
     "RSFT",
     {
-      "t": "#bf16db"
+      "t": "#bf16db",
+      "a": 6,
+      "f": 3
     },
     "1:Snip<br>2:PrtSc",
     {
       "t": "#000000",
-      "f": 3,
-      "fa": [
-        6
-      ],
+      "a": 7,
       "w": 2,
       "h": 3,
       "d": true
@@ -1089,29 +1054,35 @@
     "<b>System<br>Layer</b>",
     {
       "t": "#bf16db",
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "+Wn",
+    {
+      "f": 3
+    },
     "Brwsr<br>Bck",
     {
-      "x": 1
+      "x": 1,
+      "f": 3
     },
     "Tab<br>Fwd",
+    {
+      "f": 3
+    },
     "Brwsr<br>Fwd"
   ],
   [
     {
       "y": -0.9900000000000002,
       "x": 13,
-      "t": "#595959"
+      "t": "#595959",
+      "f": 3
     },
     "LCTL",
     {
       "x": 11.25,
-      "t": "#bf16db"
+      "t": "#bf16db",
+      "f": 3
     },
     "Tab<br>Bck"
   ],
@@ -1120,9 +1091,7 @@
       "y": -0.009999999999999787,
       "x": 4,
       "t": "#b71446",
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "F11",
     "F4",
@@ -1131,9 +1100,7 @@
     "F14",
     {
       "x": 2,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "Scroll<br>Lock",
     {
@@ -1158,16 +1125,18 @@
     "Scroll<br>Lock",
     {
       "x": 2,
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "<i class='fa fa-search'></i>",
     "<i class='fa fa-fast-backward'></i>",
     {
-      "x": 1
+      "x": 1,
+      "f": 6
     },
     "<i class='kb kb-Multimedia-Volume-Up-2'></i>",
+    {
+      "f": 4
+    },
     "<i class='fa fa-fast-forward'></i>"
   ],
   [
@@ -1175,17 +1144,13 @@
       "y": -0.9900000000000002,
       "x": 13,
       "t": "#595959",
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "RCTL",
     {
       "x": 11.25,
       "t": "#bf16db",
-      "fa": [
-        3
-      ]
+      "f": 6
     },
     "<i class='kb kb-Multimedia-Volume-Down-1'></i>"
   ],
@@ -1193,7 +1158,8 @@
     {
       "y": -0.009999999999999787,
       "x": 4,
-      "t": "#b71446"
+      "t": "#b71446",
+      "f": 4
     },
     "F10",
     "F1",
@@ -1202,34 +1168,46 @@
     "F13",
     {
       "x": 2,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "Pause<br>Break",
+    {
+      "a": 6
+    },
     "1:Curr<br>2:Opp",
     {
-      "x": 1
+      "x": 1,
+      "a": 4
     },
-    "1:Mac<br>2:Win<br>3:Save",
+    "1:Mac\n3:Save\n\n\n\n\n2:Win",
+    {
+      "a": 7
+    },
     "Boot",
     {
       "x": 0.25,
       "t": "#bf16db"
     },
     "Boot",
-    "1:Mac<br>2:Win<br>3:Save",
-    "1:Tap<br>2:Extra<br>3:Save",
+    {
+      "a": 4
+    },
+    "1:Mac\n3:Save\n\n\n\n\n2:Win",
+    "1:Tap\n3:Save\n\n\n\n\n2:Extra",
+    {
+      "a": 6
+    },
     "1:Curr<br>2:Opp",
+    {
+      "a": 7
+    },
     "Pause<br>Break",
     {
       "x": 2
     },
     "Frz",
     {
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "<i class='fa fa-outdent'></i>",
     {
@@ -1243,17 +1221,15 @@
       "y": -0.9900000000000002,
       "x": 13,
       "t": "#b71446",
-      "fa": [
-        2
-      ]
+      "a": 4,
+      "f": 3
     },
-    "1:Tap<br>2:Extra<br>3:Save",
+    "1:Tap\n3:Save\n\n\n\n\n2:Extra",
     {
       "x": 11.25,
       "t": "#bf16db",
-      "fa": [
-        3
-      ]
+      "a": 7,
+      "f": 4
     },
     "0.0"
   ],
@@ -1261,10 +1237,7 @@
     {
       "y": -0.00999999999999801,
       "x": 7,
-      "t": "#b71446",
-      "fa": [
-        2
-      ]
+      "t": "#b71446"
     },
     "<i class='fa fa-bars'></i>",
     {
@@ -1273,7 +1246,8 @@
     "Spc",
     "<i class='kb kb-Tab-1'></i>",
     {
-      "t": "#b71446"
+      "t": "#b71446",
+      "f": 1
     },
     "",
     "",
@@ -1302,9 +1276,7 @@
     "",
     "",
     {
-      "fa": [
-        3
-      ]
+      "f": 6
     },
     "<i class='kb kb-Multimedia-Stop'></i>",
     "<i class='kb kb-Multimedia-Play-Pause'></i>",
@@ -1315,17 +1287,12 @@
       "y": 0.25,
       "x": 4,
       "t": "#965010",
-      "fa": [
-        4
-      ]
+      "f": 4
     },
     "&lowast;",
     {
       "a": 5,
-      "fa": [
-        4,
-        2
-      ]
+      "f2": 3
     },
     "7\nHome",
     {
@@ -1333,10 +1300,7 @@
     },
     "9\nPgUp",
     {
-      "a": 7,
-      "fa": [
-        2
-      ]
+      "a": 7
     },
     "&minus;",
     {
@@ -1352,32 +1316,48 @@
     "<b>Num Pad<br>Layer</b>",
     {
       "t": "#965010",
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "Bksp",
     {
-      "t": "#595959"
+      "t": "#595959",
+      "f": 3
     },
     "LSFT",
     {
-      "x": 1
+      "x": 1,
+      "f": 3
     },
     "AltGr",
+    {
+      "f": 3
+    },
     "LGUI",
     {
       "x": 0.25,
-      "t": "#000000"
+      "t": "#000000",
+      "f": 3
     },
     "Undo",
+    {
+      "f": 3
+    },
     "Cut",
+    {
+      "f": 3
+    },
     "Copy",
+    {
+      "a": 6,
+      "f": 2
+    },
     "1:Paste<br>2:PstSp",
+    {
+      "a": 7,
+      "f": 3
+    },
     "Redo",
     {
-      "f": 3,
       "fa": [
         6
       ],
@@ -1387,15 +1367,18 @@
     },
     "<b>Button<br>Layer</b>",
     {
-      "f": 1,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "Redo",
+    {
+      "a": 6,
+      "f": 2
+    },
     "1:Paste<br>2:PstSp",
     {
-      "x": 1
+      "x": 1,
+      "a": 7,
+      "f": 3
     },
     "Cut",
     "Undo"
@@ -1406,19 +1389,14 @@
       "x": 6,
       "t": "#965010",
       "a": 5,
-      "fa": [
-        4,
-        2
-      ]
+      "f": 4
     },
     "8\n<i class='fa fa-caret-up'></i>",
     {
       "x": 6,
       "t": "#595959",
       "a": 7,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "LCTL",
     {
@@ -1432,17 +1410,11 @@
       "y": -0.010000000000001563,
       "x": 4,
       "t": "#965010",
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "=",
     {
-      "a": 5,
-      "fa": [
-        4,
-        2
-      ]
+      "a": 5
     },
     "4\n<i class='fa fa-caret-left'></i>",
     {
@@ -1450,14 +1422,12 @@
     },
     "6\n<i class='fa fa-caret-right'></i>",
     {
-      "a": 7,
-      "fa": [
-        2
-      ]
+      "a": 7
     },
     "+",
     {
-      "x": 2
+      "x": 2,
+      "f": 3
     },
     "Num<br>Lock",
     {
@@ -1495,18 +1465,14 @@
       "x": 6,
       "t": "#965010",
       "a": 5,
-      "fa": [
-        4
-      ]
+      "f": 4
     },
     "5",
     {
       "x": 6,
       "t": "#595959",
       "a": 7,
-      "fa": [
-        2
-      ]
+      "f": 3
     },
     "RCTL",
     {
@@ -1520,17 +1486,12 @@
       "y": -0.010000000000001563,
       "x": 4,
       "t": "#965010",
-      "fa": [
-        3
-      ]
+      "f": 4
     },
     "/",
     {
       "a": 5,
-      "fa": [
-        4,
-        2
-      ]
+      "f2": 3
     },
     "1\nEnd",
     {
@@ -1540,42 +1501,33 @@
     {
       "a": 7,
       "fa": [
-        2
+        3
       ]
     },
     "Enter",
     {
-      "x": 2
+      "x": 2,
+      "f": 3
     },
     "Spc",
+    {
+      "a": 6
+    },
     "1:Curr<br>2:Opp",
     {
       "x": 1,
       "t": "#595959",
       "a": 5,
-      "fa": [
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2
-      ]
+      "f": 4
     },
-    ">\n\n\n\n\n\n.",
-    {
-      "fa": [
-        2,
-        2
-      ]
-    },
+    ">\n.",
     "?\n/",
     {
       "x": 0.25,
       "c": "#bbbbbb",
       "t": "#000000",
-      "a": 7
+      "a": 7,
+      "f": 3
     },
     "Undo",
     {
@@ -1583,15 +1535,29 @@
     },
     "Cut",
     "Copy",
+    {
+      "a": 6,
+      "f": 2
+    },
     "1:Paste<br>2:PstSp",
+    {
+      "a": 7,
+      "f": 3
+    },
     "Redo",
     {
       "x": 2
     },
     "Redo",
+    {
+      "a": 6,
+      "f": 2
+    },
     "1:Paste<br>2:PstSp",
     {
-      "x": 1
+      "x": 1,
+      "a": 7,
+      "f": 3
     },
     "Cut",
     {
@@ -1606,30 +1572,19 @@
       "c": "#cccccc",
       "t": "#965010",
       "a": 5,
-      "fa": [
-        4,
-        2
-      ]
+      "f": 4
     },
     "2\n<i class='fa fa-caret-down'></i>",
     {
       "x": 6,
-      "t": "#595959",
-      "fa": [
-        2,
-        2,
-        0,
-        0,
-        0,
-        0,
-        2
-      ]
+      "t": "#595959"
     },
-    "<\n\n\n\n\n\n,",
+    "<\n,",
     {
       "x": 11.25,
       "t": "#000000",
-      "a": 7
+      "a": 7,
+      "f": 3
     },
     "Copy"
   ],
@@ -1637,22 +1592,21 @@
     {
       "y": -0.010000000000001563,
       "x": 7,
-      "t": "#965010"
+      "t": "#965010",
+      "f": 4
     },
     ",",
     {
       "a": 5,
-      "fa": [
-        4,
-        2
-      ]
+      "f2": 3
     },
     "0\nInsert",
     ".\nDelete",
     {
       "t": "#595959",
       "g": true,
-      "a": 7
+      "a": 7,
+      "f": 1
     },
     "",
     {
@@ -1667,7 +1621,8 @@
     "",
     {
       "x": 6.25,
-      "t": "#000000"
+      "t": "#000000",
+      "f": 3
     },
     "Middle",
     "Left",
