@@ -305,22 +305,30 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
-        // Em Dash
+        // Em Dash or Underscore
         case U_MDASH:
             if (record->event.pressed) {
-                if (isMac) {                    // Mac em dash
-                    register_code(KC_LALT);
-                    register_code(KC_LSFT);
-                    tap_code(KC_MINS);
-                    unregister_code(KC_LSFT);
-                    unregister_code(KC_LALT);
-                } else {                        // Win em dash
-                    register_code(KC_LALT);
-                    tap_code(KC_KP_0);
-                    tap_code(KC_KP_1);
-                    tap_code(KC_KP_5);
-                    tap_code(KC_KP_1);
-                    unregister_code(KC_LALT);
+                // Check if Shift is held (normal or one-shot)
+                uint8_t active_mods = get_mods() | get_oneshot_mods();
+                if (active_mods & MOD_MASK_SHIFT) {
+                    // Send Em-Dash when shifted
+                    if (isMac) {                    // Mac em dash
+                        register_code(KC_LALT);
+                        register_code(KC_LSFT);
+                        tap_code(KC_MINS);
+                        unregister_code(KC_LSFT);
+                        unregister_code(KC_LALT);
+                    } else {                        // Win em dash
+                        register_code(KC_LALT);
+                        tap_code(KC_KP_0);
+                        tap_code(KC_KP_1);
+                        tap_code(KC_KP_5);
+                        tap_code(KC_KP_1);
+                        unregister_code(KC_LALT);
+                    }
+                } else {
+                    // Send underscore when not shifted
+                    tap_code16(KC_UNDS);  // KC_UNDS == Shift+Minus
                 }
             }
             return false;
