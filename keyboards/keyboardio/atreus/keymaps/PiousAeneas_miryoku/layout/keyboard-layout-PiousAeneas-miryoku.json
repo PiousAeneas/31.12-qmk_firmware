@@ -658,18 +658,18 @@
     },
     "<b>Caps Word</b> capitalizes all alphas until a space key is pressed or any key other than the following:<br><br><code>A</code>-<code>Z</code>, <code>0</code>-<code>9</code>, <code>-</code>, <code>_</code>, <code>DEL</code>, <code>BSPC</code>",
     {
-      "t": "#108896",
-      "f": 1
+      "t": "#595959",
+      "f": 4
     },
-    "",
+    "Esc",
     {
       "g": true
     },
-    "",
+    "Spc",
     {
       "g": false
     },
-    "",
+    "<i class='kb kb-Tab-1'></i>",
     {
       "t": "#595959",
       "f": 4
@@ -960,18 +960,19 @@
     "REC2",
     {
       "x": 6.25,
-      "t": "#e55b10",
-      "f": 1
+      "t": "#595959",
+      "f": 4
     },
-    "",
-    "",
+    "Esc",
+    "Spc",
     {
       "g": true
     },
-    "",
+    "<i class='kb kb-Tab-1'></i>",
     {
       "g": false,
-      "f": 3
+      "f": 3,
+      "t": "#e55b10"
     },
     "Right",
     "Left",
@@ -1265,17 +1266,18 @@
     },
     "<b>Mac Mode</b> swaps <code>GUI</code> with <code>Ctrl</code>, reverses scroll directions, and changes OS-specific shortcuts for clipboard functions, print screen, system search, and browser navigation.",
     {
-      "t": "#bf16db",
+      "t": "#595959",
       "g": true,
-      "f": 1
+      "f": 4
     },
-    "",
+    "Esc",
     {
       "g": false
     },
-    "",
-    "",
+    "Spc",
+    "<i class='kb kb-Tab-1'></i>",
     {
+      "t": "#bf16db",
       "f": 6
     },
     "<i class='kb kb-Multimedia-Stop'></i>",
