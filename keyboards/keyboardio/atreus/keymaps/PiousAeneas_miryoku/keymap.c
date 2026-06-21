@@ -437,8 +437,9 @@ bool caps_word_press_user(uint16_t keycode) {
 // Tapping Term per Key modifications
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case LGUI_T(KC_A): // Left home-row pinky
-        case RGUI_T(KC_O): // Right home-row pinky
+        case LGUI_T(KC_A):    // Left home-row pinky (Colemak + QWERTY)
+        case RGUI_T(KC_O):    // Right home-row pinky (Colemak)
+        case RGUI_T(KC_QUOT): // Right home-row pinky (QWERTY)
             return TAPPING_TERM + 50; // Add 50ms to pinky tapping term.
         default:
             return TAPPING_TERM;
