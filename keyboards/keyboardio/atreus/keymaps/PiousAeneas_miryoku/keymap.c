@@ -305,30 +305,29 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
-        // Em Dash or Underscore
+        // Em Dash (shifted) or Underscore (unshifted)
         case U_MDASH:
             if (record->event.pressed) {
-                // Check if Shift is held (normal or one-shot)
-                uint8_t active_mods = get_mods() | get_oneshot_mods();
+                uint8_t active_mods = get_mods() | get_oneshot_mods();   // Snapshot mods at trigger time
                 if (active_mods & MOD_MASK_SHIFT) {
-                    // Send Em-Dash when shifted
-                    if (isMac) {                    // Mac em dash
+                    if (isMac) {                          // Mac: Option+Shift+Minus (Shift already held)
                         register_code(KC_LALT);
-                        register_code(KC_LSFT);
                         tap_code(KC_MINS);
-                        unregister_code(KC_LSFT);
                         unregister_code(KC_LALT);
-                    } else {                        // Win em dash
+                    } else {                              // Win: Alt+0151 — requires Num Lock ON
+                        uint8_t saved_mods = get_mods();  // Save held mods to restore after
+                        clear_mods();                     // Drop Shift: inverts numpad entry + can switch layout
+                        clear_oneshot_mods();
                         register_code(KC_LALT);
                         tap_code(KC_KP_0);
                         tap_code(KC_KP_1);
                         tap_code(KC_KP_5);
                         tap_code(KC_KP_1);
                         unregister_code(KC_LALT);
+                        set_mods(saved_mods);             // Restore held mods (e.g. still-held home-row Shift)
                     }
                 } else {
-                    // Send underscore when not shifted
-                    tap_code16(KC_UNDS);  // KC_UNDS == Shift+Minus
+                    tap_code16(KC_UNDS);                  // Unshifted: underscore
                 }
             }
             return false;
