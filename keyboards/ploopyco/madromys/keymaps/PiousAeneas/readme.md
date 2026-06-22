@@ -9,7 +9,7 @@ Custom, cross-platform firmware for the Ploopy Adept designed for ambidextrous u
 
 - **Cross-Platform Support**: Mac Mode remaps clipboard shortcuts, browser navigation, and scroll direction for macOS compatibility. Toggle (Win) Mac Mode by (double) tapping the bottom outer button in the clipboard layer.
 - **Built-in Clipboard**: Access clipboard functions (Copy, Cut, Paste, Paste w/o Formatting, Undo, Redo) by holding the inner browser navigation layer-tap key.
-- **Combo Scrolling**: Default Drag Scroll is converted to Combo Scroll. Tap `COMBO_SCROLL` to toggle drag-scroll and Scroll Layer; hold to activate momentary drag-scroll.
+- **Combo Scrolling**: Default Drag Scroll is converted to Combo Scroll. Tap `COMBO_SCROLL` to enter latched scroll mode (drag-scroll on + Scroll layer; exit by tapping `RET_LEFT`/`RET_RGHT`); hold for momentary drag-scroll.
 - **Ambidextrous Compatibility**: Tap the bottom outer key to switch default handedness; hold for middle click.
 - **DPI and Scroll Speed Tuning**: Adjust mouse DPI by combo tapping the top (bottom) two corner buttons to adjust DPI up (down). Adjust Scroll Speed relative to DPI by tapping the top (bottom) two corner buttons to increase (decrease) scroll speed relative to DPI.
 

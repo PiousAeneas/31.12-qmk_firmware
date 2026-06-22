@@ -35,8 +35,8 @@ typedef union {
     uint32_t raw;               // Raw 32-bit representation for EEPROM read/write
     struct {
         uint8_t scroll_div;     // Divisor for scroll speed vs. DPI
-        uint8_t default_layer;  // Layer to switch to on reset
-        bool mac_mode : 1;      // Mac mode toggle (1 bit)
+        uint8_t reserved;       // Unused (was default_layer); kept to preserve EEPROM byte layout
+        bool mac_mode : 1;      // Mac mode toggle (a 1-bit bitfield can only read back 0 or 1)
     };
 } user_config_t;
 
@@ -44,6 +44,7 @@ user_config_t user_config;      // Declare runtime instance used to read/write E
 
 // Configure persistent default hardcodes for Relative Scroll Speed and Mac Mode
 void eeconfig_init_user(void) {
+    user_config.raw = 0;                                   // Clear all fields (incl. reserved byte) before writing defaults
     user_config.scroll_div = PLOOPY_DRAGSCROLL_DIVISOR_H;  // Default scroll divisor from config.h
     user_config.mac_mode = false;                          // Default Mac mode (off = Win)
     eeconfig_update_user(user_config.raw);                 // Save to EECONFIG_USER
@@ -62,16 +63,16 @@ enum layer_names {
 #define DEFAULT_LAYER _RIGHT                            // Hardcoded default layer
 static uint8_t current_default_layer = DEFAULT_LAYER;   // Variable to track current default
 
-// Define default Windows clipboard actions
-#define U_CPY C(KC_C)
-#define U_CUT C(KC_X)
+// Define default Windows clipboard actions (Copy/Cut go through TD(U_TD_CPYCUT))
 #define U_UND C(KC_Z)
 #define U_RDO C(KC_Y)
 
-// Define Combo Drag Scroll variables
-extern bool is_drag_scroll;         // External variable from ploopyco.c
-extern int8_t comboscroll_invert;   // Used to invert scroll directions for Mac
-static uint16_t scroll_timer;       // Timer variable for COMBO_SCROLL
+// Define Combo Drag Scroll variables (keymap-owned, so stock ploopyco.c needs no changes)
+static bool combo_scroll_on = false;   // Replaces stock is_drag_scroll; keeps the scroll logic in the keymap
+static int8_t comboscroll_invert = 1;  // Inverts scroll direction for Mac (1 = normal, -1 = Mac natural)
+static uint16_t scroll_timer;          // Timer variable for COMBO_SCROLL
+static float scroll_carry_h = 0;       // Sub-integer scroll remainder, horizontal
+static float scroll_carry_v = 0;       // Sub-integer scroll remainder, vertical
 
 // Define timer variables for custom key combos
 static uint16_t reset_timer;        // Timer for RESET combo
@@ -82,14 +83,37 @@ uint16_t custom_dpi_array[] = PLOOPY_DPI_OPTIONS;       // Get options from conf
 #define DPI_OPTION_SIZE ARRAY_SIZE(custom_dpi_array)    // Used in DPI config logic
 static uint8_t current_dpi  = PLOOPY_DPI_DEFAULT;       // Variable to track DPI
 
-// Define variables for Scroll Speed adjustment
-extern uint16_t dragscroll_divisor_h;   // To track scroll speed adjustments
-extern uint16_t dragscroll_divisor_v;   // To track  scroll speed adjustments
+// Define variables for Scroll Speed adjustment (keymap-owned)
+static uint16_t dragscroll_divisor_h = PLOOPY_DRAGSCROLL_DIVISOR_H;   // Runtime-adjustable horizontal scroll divisor
+static uint16_t dragscroll_divisor_v = PLOOPY_DRAGSCROLL_DIVISOR_V;   // Runtime-adjustable vertical scroll divisor
 
 // Define boolean to track Mac Mode
 bool isMac = false;
 
 // --- HELPER FUNCTIONS ---
+
+// EEPROM/runtime value validators - clamp anything out of range back to a safe default
+static uint8_t sanitize_dpi_index(uint8_t idx) {
+    return (idx < DPI_OPTION_SIZE) ? idx : PLOOPY_DPI_DEFAULT; // guard custom_dpi_array[] indexing
+}
+
+static uint8_t sanitize_scroll_div(uint16_t div) { // takes the uint16_t runtime divisor, returns a byte safe for the uint8_t field
+    return (div >= DRAGSCROLL_DIV_MIN && div <= DRAGSCROLL_DIV_MAX) ? (uint8_t)div : PLOOPY_DRAGSCROLL_DIVISOR_H;
+}
+
+static uint8_t sanitize_default_layer_index(uint8_t layer) { // validate a bare layer index (used on save)
+    return (layer == _RIGHT || layer == _LEFT) ? layer : DEFAULT_LAYER;
+}
+
+static uint8_t sanitize_default_layer_state(layer_state_t state) { // single-bit default-layer mask in, layer index out (used on boot)
+    if (state == (1UL << _RIGHT)) {
+        return _RIGHT;
+    }
+    if (state == (1UL << _LEFT)) {
+        return _LEFT;
+    }
+    return DEFAULT_LAYER;
+}
 
 // Helper function for setting Mac Mode
 void set_mac_mode(bool enable) {
@@ -101,24 +125,30 @@ void set_mac_mode(bool enable) {
 
 // Save and Reset helper functions
 void quick_reset(void) { // Reset DPI, Scroll Speed, and Active Layer to last saved defaults
-    current_dpi = keyboard_config.dpi_config;               // Reset to last saved DPI
+    current_dpi = sanitize_dpi_index(keyboard_config.dpi_config); // Reset to last saved DPI (validated)
+    keyboard_config.dpi_config = current_dpi;               // Keep backing config in sync with the tracker
     pointing_device_set_cpi(custom_dpi_array[current_dpi]); // Apply DPI
 
-    dragscroll_divisor_h = user_config.scroll_div;          // Reset to last saved scroll speed
-    dragscroll_divisor_v = user_config.scroll_div;          // Reset to last saved scroll speed
+    user_config.scroll_div = sanitize_scroll_div(user_config.scroll_div); // Reset to last saved scroll speed (validated, never 0)
+    dragscroll_divisor_h = user_config.scroll_div;
+    dragscroll_divisor_v = dragscroll_divisor_h;            // Mirror to vertical scroll
     
-    is_drag_scroll = 0;                                     // Turn off drag scroll
+    combo_scroll_on = false;                                // Turn off drag scroll (keymap-owned flag)
     layer_clear();                                          // Clear all layers other than default
 }
 
 void save_settings(void) {                          // Save DPI, Scroll Speed, Mac Mode, and Layer
+    current_dpi = sanitize_dpi_index(current_dpi);  // Validate before writing to EEPROM
     keyboard_config.dpi_config = current_dpi;       // Save current DPI
     eeconfig_update_kb(keyboard_config.raw);        // Write DPI to EEPROM (handled by base ploopyco.c code)
     
+    dragscroll_divisor_h = sanitize_scroll_div(dragscroll_divisor_h); // Validate current scroll divisor
+    dragscroll_divisor_v = dragscroll_divisor_h;    // Keep H/V scroll divisors mirrored
     user_config.scroll_div = dragscroll_divisor_h;  // Save current scroll divisor
-    user_config.mac_mode   = isMac;                 // Save current Mac Mode state
+    user_config.mac_mode   = isMac;                 // Save current Mac Mode state (bitfield is inherently 0/1)
     eeconfig_update_user(user_config.raw);          // Write custom user settings to EEPROM
     
+    current_default_layer = sanitize_default_layer_index(current_default_layer); // Validate before writing persistent default layer
     set_single_persistent_default_layer(current_default_layer);  // Write current default layer to EEPROM
 }
 
@@ -210,15 +240,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     // Perform redo action for Mac (Cmd+Shift+Z)
     case U_RDO:
-        if (record->event.pressed) {
-            if (isMac) {
+        if (isMac) {                                       // Mac: redo is Cmd+Shift+Z, not Cmd+Y
+            if (record->event.pressed) {
                 register_code(KC_LCMD);
                 register_code(KC_LSFT);
                 tap_code(KC_Z);
                 unregister_code(KC_LSFT);
                 unregister_code(KC_LCMD);
-                return false;
             }
+            return false;                                  // Swallow both edges in Mac mode
         }
         return true; // Else use default redo (Windows)
             
@@ -239,13 +269,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // Custom Layer Taps for U_BRWSR_BCK and U_BRWSR_FWD using Mod-Tap Intercept
     case LT(_LCLIP, KC_WBAK):
     case LT(_RCLIP, KC_WFWD):
-        if (record->tap.count && record->event.pressed) { // Execute browser nav on tap - copied from above
-            if (isMac) {
-                register_code(KC_LGUI);
-                tap_code(keycode == LT(_LCLIP, KC_WBAK) ? KC_LBRC : KC_RBRC);
-                unregister_code(KC_LGUI);
-            } else {
-                tap_code(keycode == LT(_LCLIP, KC_WBAK) ? KC_WBAK : KC_WFWD);
+        if (record->tap.count) {                           // Tap: act on press, swallow the release too
+            if (record->event.pressed) {                   // Execute browser nav on tap - copied from above
+                if (isMac) {
+                    register_code(KC_LGUI);
+                    tap_code(keycode == LT(_LCLIP, KC_WBAK) ? KC_LBRC : KC_RBRC);
+                    unregister_code(KC_LGUI);
+                } else {
+                    tap_code(keycode == LT(_LCLIP, KC_WBAK) ? KC_WBAK : KC_WFWD);
+                }
             }
             return false; // Skip all further processing of this key
         }
@@ -254,28 +286,30 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // Custom Layer Taps for Chirality and Middle Click using Mod-Tap Intercept
     case LT(_RIGHT, KC_M):
     case LT(_LEFT, KC_M):
-        if (record->tap.count && record->event.pressed) { // Set default layer to other hand on Tap
-            current_default_layer = (keycode == LT(_RIGHT, KC_M)) ? _RIGHT : _LEFT; // toggle hands
-            default_layer_set(1UL << current_default_layer); // set as default
-            return false;
-        } else { // Hold
-            if (record->event.pressed) {
-                register_code(KC_BTN3); // Press middle click on hold
-            } else {
-                unregister_code(KC_BTN3); // Release middle click on release
+        if (record->tap.count) {                           // Tap: switch handedness on press, swallow the release
+            if (record->event.pressed) {                   // Set default layer to other hand on Tap
+                current_default_layer = (keycode == LT(_RIGHT, KC_M)) ? _RIGHT : _LEFT; // toggle hands
+                default_layer_set(1UL << current_default_layer); // set as default
             }
+            return false;
+        }
+        // Hold: middle click - only register/unregister on the hold's own edges
+        if (record->event.pressed) {
+            register_code(KC_BTN3); // Press middle click on hold
+        } else {
+            unregister_code(KC_BTN3); // Release middle click on release
         }
         return false; // Skip all further processing of this key
 
     case COMBO_SCROLL: // Turns on drag scroll and Scroll layer on tap, momentary drag scroll on hold
         if (record->event.pressed) { // on key down
             scroll_timer = timer_read(); // read out the time of key down
-            is_drag_scroll = 1; // turn on drag scroll
+            combo_scroll_on = true; // turn on drag scroll
         } else { // on key release
             if (timer_elapsed(scroll_timer) < TAPPING_TERM) { // key was tapped
                 layer_on(_SCROLL); // turn on Scroll layer
             } else { // key was held
-                is_drag_scroll = 0; // turn off drag scroll on key release
+                combo_scroll_on = false; // turn off drag scroll on key release
             }
         }
         return false; // Skip all further processing of this key
@@ -284,7 +318,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case RET_RGHT:
     case RET_LEFT:
         if (record->event.pressed) { // On key down
-            is_drag_scroll = 0;                          // Disable drag scroll mode
+            combo_scroll_on = false;                     // Disable drag scroll mode (keymap-owned flag)
             layer_off(_SCROLL);                          // Turn off Scroll layer
 
             uint8_t target = (keycode == RET_RGHT ? _RIGHT : _LEFT);  // Determine target layer based on keycode
@@ -346,10 +380,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // Layer independent combos - All layers except _SCROLL use _RIGHT as the combo reference layer.
 uint8_t combo_ref_from_layer(uint8_t layer){
-    switch (get_highest_layer(layer_state)){
-        case _SCROLL: return _SCROLL;
-        default: return _RIGHT;
-    }
+    return (layer == _SCROLL) ? _SCROLL : _RIGHT;   // use the layer QMK passes in
 }
 
 enum combo_events {
@@ -465,10 +496,44 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 // --- HARDWARE SETUP ---
+
+// Drag-scroll transform, kept in the keymap so stock ploopyco.c needs no changes.
+// Stock pointing_device_task_kb() calls this first, then skips its own drag-scroll
+// block because this keymap never sets the stock is_drag_scroll flag.
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+    if (combo_scroll_on) {
+        scroll_carry_h += (float)mouse_report.x / (float)dragscroll_divisor_h; // runtime-adjustable divisor
+        scroll_carry_v += (float)mouse_report.y / (float)dragscroll_divisor_v;
+
+        mouse_report.h = comboscroll_invert * (int8_t)scroll_carry_h;          // comboscroll_invert flips sign for Mac
+#ifdef PLOOPY_DRAGSCROLL_INVERT
+        mouse_report.v = comboscroll_invert * -(int8_t)scroll_carry_v;
+#else
+        mouse_report.v = comboscroll_invert * (int8_t)scroll_carry_v;
+#endif
+        scroll_carry_h -= (int8_t)scroll_carry_h;                              // keep the fractional remainder
+        scroll_carry_v -= (int8_t)scroll_carry_v;
+
+        mouse_report.x = 0;
+        mouse_report.y = 0;
+    }
+    return mouse_report;
+}
+
 // Restore user settings from EEPROM after QMK and keyboard init
 void keyboard_post_init_user(void) {
     user_config.raw = eeconfig_read_user();             // Load saved user config from EEPROM
-    set_mac_mode(user_config.mac_mode);                 // Apply saved Mac/Win mode setting
+
+    keyboard_config.dpi_config = sanitize_dpi_index(keyboard_config.dpi_config); // Repair the index ploopyco loaded, in RAM
+    current_dpi = keyboard_config.dpi_config;           // Sync DPI tracker so the first +/- steps from the right place
+    pointing_device_set_cpi(custom_dpi_array[current_dpi]); // Re-assert CPI from the sanitized index (keymap owns final CPI on stock ploopyco.c)
+
+    user_config.scroll_div = sanitize_scroll_div(user_config.scroll_div); // Repair a bad saved divisor (e.g. a 0 from a pre-fix save)
     dragscroll_divisor_h = user_config.scroll_div;      // Restore horizontal scroll speed
     dragscroll_divisor_v = user_config.scroll_div;      // Mirror to vertical scroll
+
+    current_default_layer = sanitize_default_layer_state(default_layer_state); // Sync handedness tracker to the layer QMK restored in quantum_init()
+    default_layer_set(1UL << current_default_layer);    // Re-assert a clean single default layer if the restored state was invalid
+
+    set_mac_mode(user_config.mac_mode);                 // Apply saved Mac/Win mode (bitfield is already 0/1)
 }

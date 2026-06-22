@@ -9,4 +9,4 @@
 #define PLOOPY_DRAGSCROLL_DIVISOR_V PLOOPY_DRAGSCROLL_DIVISOR_H 	// Slow down scroll speed. Same as H by default.
 #define DRAGSCROLL_DIV_STEP 8 			// Dragscroll divisor step size
 #define DRAGSCROLL_DIV_MIN 8 			// Minimum Dragscroll Divisor
-#define DRAGSCROLL_DIV_MAX 256 			// Maximum Dragscroll Divisor
+#define DRAGSCROLL_DIV_MAX 248 			// Maximum Dragscroll Divisor (<=255 so it never overflows the uint8_t scroll_div EEPROM field)
